@@ -1,0 +1,5 @@
+C:\Users\Carson\source\repos\Lawful\obj\Debug\net5.0\Lawful.csproj.AssemblyReference.cache
+C:\Users\Carson\source\repos\Lawful\obj\Debug\net5.0\Lawful.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Carson\source\repos\Lawful\obj\Debug\net5.0\Lawful.AssemblyInfoInputs.cache
+C:\Users\Carson\source\repos\Lawful\obj\Debug\net5.0\Lawful.AssemblyInfo.cs
+C:\Users\Carson\source\repos\Lawful\obj\Debug\net5.0\Lawful.csproj.CoreCompileInputs.cache
