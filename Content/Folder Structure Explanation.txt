@@ -1,0 +1,24 @@
+Each new profile (i.e. Konym) can only play on one story when created
+To play a different installed story, the user must create a new profile
+
+This helps ensure that directory and file clutter is cut-down and easily organized by forcing each user save directory to contain exactly one Computers.xml file
+
+Folder Structure Example:
+
+	Content
+		Saves
+			Konym
+				User.xml
+				Computers.xml
+			Other
+				User.xml
+				Computers.xml
+
+		Story
+			Lawful
+				Story.xml
+				Computers.xml
+
+			Other
+				Story.xml
+				Computers.xml

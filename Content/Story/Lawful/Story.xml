@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<Story xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Start="shouldersofgiants" Name="Lawful">
+  <Mission Name="Stood Upon the Sholders of Giants" ID="shouldersofgiants" AssemblyPath="Missions\shouldersofgiants\net5.0\shouldersofgiants.dll" />
+</Story>

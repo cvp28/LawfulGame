@@ -1,0 +1,13 @@
+C:\Users\Carson\source\repos\LawfulGame\Content\Story\Lawful\Missions\shouldersofgiants\net5.0\shouldersofgiants.deps.json
+C:\Users\Carson\source\repos\LawfulGame\Content\Story\Lawful\Missions\shouldersofgiants\net5.0\shouldersofgiants.dll
+C:\Users\Carson\source\repos\LawfulGame\Content\Story\Lawful\Missions\shouldersofgiants\net5.0\ref\shouldersofgiants.dll
+C:\Users\Carson\source\repos\LawfulGame\Content\Story\Lawful\Missions\shouldersofgiants\net5.0\shouldersofgiants.pdb
+C:\Users\Carson\source\repos\LawfulGame\Missions\shouldersofgiants\obj\Release\net5.0\shouldersofgiants.csproj.AssemblyReference.cache
+C:\Users\Carson\source\repos\LawfulGame\Missions\shouldersofgiants\obj\Release\net5.0\shouldersofgiants.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Carson\source\repos\LawfulGame\Missions\shouldersofgiants\obj\Release\net5.0\shouldersofgiants.AssemblyInfoInputs.cache
+C:\Users\Carson\source\repos\LawfulGame\Missions\shouldersofgiants\obj\Release\net5.0\shouldersofgiants.AssemblyInfo.cs
+C:\Users\Carson\source\repos\LawfulGame\Missions\shouldersofgiants\obj\Release\net5.0\shouldersofgiants.csproj.CoreCompileInputs.cache
+C:\Users\Carson\source\repos\LawfulGame\Missions\shouldersofgiants\obj\Release\net5.0\shouldersofgiants.csproj.CopyComplete
+C:\Users\Carson\source\repos\LawfulGame\Missions\shouldersofgiants\obj\Release\net5.0\shouldersofgiants.dll
+C:\Users\Carson\source\repos\LawfulGame\Missions\shouldersofgiants\obj\Release\net5.0\ref\shouldersofgiants.dll
+C:\Users\Carson\source\repos\LawfulGame\Missions\shouldersofgiants\obj\Release\net5.0\shouldersofgiants.pdb

@@ -44,7 +44,18 @@ namespace Lawful
         static void Main()
         {
             // Init
-            Directory.SetCurrentDirectory(@"C:\Users\Carson\source\repos\Lawful");
+            // The directory pointed to here should have the following structure in it:
+            //
+            //  Content
+            //      Saves
+            //      Story
+            //
+            // 'Saves' is where the game will store save data
+            // 'Story' is where the game will look for installed storylines
+            //      The default story is "Lawful" and is included in the repo
+            //      This story will release with the game and user-created stories can exist as well
+
+            Directory.SetCurrentDirectory(@"C:\Users\Carson\source\repos\LawfulGame");
 
             while (Active)
             {
