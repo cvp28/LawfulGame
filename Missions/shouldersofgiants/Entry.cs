@@ -11,6 +11,8 @@ namespace Lawful.Mission
 			e.CommandEntered += Mission.OnCommandEntered;
 		}
 
+
+
 		public static void Unload(EventManager e)
 		{
 			e.CommandEntered -= Mission.OnCommandEntered;
