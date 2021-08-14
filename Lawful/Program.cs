@@ -88,48 +88,6 @@ namespace Lawful
                             CurrentState = GameState.Exiting;
                             continue;
                     }
-
-                    // Old
-                    //  switch (Console.ReadLine())
-                    //  {
-                    //      case "1":
-                    //          Console.Clear();
-                    //  
-                    //          // Replace this bit with code that loads save data determined by the user
-                    //          Console.Write("Loading user data, ");
-                    //              xUser.Load(@".\User.xml");
-                    //          
-                    //              Console.Write("creating user... ");
-                    //              Player = User.FromFile(ref xUser);
-                    //          Console.WriteLine("done.");
-                    //  
-                    //          Console.Write("Loading network structure... ");
-                    //              xNetworkStructure.Load(@".\Computers.xml");
-                    //              xNetworks = xNetworkStructure.SelectSingleNode("Networks");
-                    //          Console.WriteLine("done.");
-                    //  
-                    //          Console.Write("Setting current mission...");
-                    //              XmlDocument xMission = new XmlDocument();
-                    //              xMission.Load(@".\Missions\shouldersofgiants\test_mission_precompiledassembly.xml");
-                    //              Player.CurrentMissionNode = xMission.SelectSingleNode("DynamicMission");
-                    //              Player.CurrentMission = new DynamicMission(Player.CurrentMissionNode);
-                    //          Console.Write("done.");
-                    //  
-                    //          Player.ConnectToHome();
-                    //  
-                    //          Console.WriteLine();
-                    //          Console.WriteLine();
-                    //  
-                    //          CurrentState = GameState.Console;
-                    //          continue;
-                    //  
-                    //      case "2":
-                    //          CurrentState = GameState.Exiting;
-                    //          continue;
-                    //  
-                    //      default:
-                    //          continue;
-                    //  }
                 }
 
                 while (CurrentState == GameState.NewGame)
