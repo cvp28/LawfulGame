@@ -1,0 +1,41 @@
+﻿<Root>
+	<Directory Name="home">
+		<File Name="test.txt">
+This is a test document
+		</File>
+		<Directory Name="Konym">
+			<Directory Name="Documents">
+				<File Name="reminder.txt">
+1. Apply for a job
+2. Study for US History test
+3. Investigate hacker forum
+4. ???
+5.
+6.
+7. Profit
+				</File>
+			</Directory> 
+		</Directory>
+	</Directory>
+	<Directory Name="sys">
+		<File Name="kguilib.sys"/>
+		<File Name="netman.sys"/>
+		<File Name="kcmk.sys"/>
+		<File Name="sfs.sys"/>
+	</Directory>
+	<Directory Name="bin">
+		<File Name="ssh" Command="ssh"/>
+		<File Name="su" Command="su"/>
+		<File Name="scan" Command="scan"/>
+		<File Name="ls" Command="ls"/>
+		<File Name="cd" Command="cd"/>
+		<File Name="mv" Command="mv"/>
+		<File Name="rm" Command="rm"/>
+		<File Name="cr" Command="cr"/>
+		<File Name="cat" Command="cat"/>
+		<File Name="sus" Command="sus"/>
+		<File Name="clear" Command="clear"/>
+		<File Name="dc" Command="dc"/>
+		<File Name="pwd" Command="pwd"/>
+	</Directory>
+</Root>

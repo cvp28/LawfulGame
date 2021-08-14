@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <ComputerStructure xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <Computer Name="REPLACETHIS" Address="117.92.201.6">
+  <Computer Name="Apollo-PC" Address="117.92.201.6">
     <ScanResult Name="bedroom_link" Address="172.116.23.251" />
     <Account Username="root" Password="root" />
-    <Account Username="REPLACETHIS" Password="" />
+    <Account Username="Konym" Password="" />
     <Account Username="www-root" Password="" />
     <Drive Type="Sytem" Label="Main">
       <Root>

@@ -14,7 +14,7 @@ namespace Lawful.GameObjects
 		public UserAccount Account;
 
 		[XmlIgnore]
-		public string ReferenceHomeAddress;
+		internal string ReferenceHomeAddress;
 
 		[XmlIgnore]
 		internal string ReferenceUsername;
@@ -83,8 +83,8 @@ namespace Lawful.GameObjects
 
 			ConnectionInfo.PC = ComputerStructure.GetComputer(ConnectionReference.ReferenceAddress);
 			ConnectionInfo.User = ConnectionInfo.PC.GetUser(ConnectionReference.ReferenceUsername);
-			ConnectionInfo.Disk = ConnectionInfo.PC.GetDisk(ConnectionReference.ReferenceLabel);
-			ConnectionInfo.PathNode = ConnectionInfo.Disk.GetNodeFromPath(ConnectionReference.ReferencePath);
+			ConnectionInfo.Drive = ConnectionInfo.PC.GetDisk(ConnectionReference.ReferenceLabel);
+			ConnectionInfo.PathNode = ConnectionInfo.Drive.GetNodeFromPath(ConnectionReference.ReferencePath);
 		}
 	}
 }

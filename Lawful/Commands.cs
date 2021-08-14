@@ -84,8 +84,8 @@ namespace Lawful
                 Player.ConnectionInfo.PC = TryPC;
 
                 Player.ConnectionInfo.User = TryUser;
-                Player.ConnectionInfo.PathNode = Player.ConnectionInfo.PC.GetPrimaryDisk().Root;
-                Player.ConnectionInfo.Disk = Player.ConnectionInfo.PC.GetPrimaryDisk();
+                Player.ConnectionInfo.PathNode = Player.ConnectionInfo.PC.GetSystemDrive().Root;
+                Player.ConnectionInfo.Drive = Player.ConnectionInfo.PC.GetSystemDrive();
 
                 Events.FireSSHConnect(Player, Computers, Query);
             }
@@ -186,7 +186,7 @@ namespace Lawful
                 // Else, default to the cwd
 
                 if (Source.Attributes["Command"] is not null)
-                    Destination = Player.ConnectionInfo.PC.GetPrimaryDisk().GetNodeFromPath("/bin");
+                    Destination = Player.ConnectionInfo.PC.GetSystemDrive().GetNodeFromPath("/bin");
                 else
                     Destination = Player.ConnectionInfo.PathNode;
             }
@@ -317,7 +317,7 @@ namespace Lawful
 
             // Now try to locate the file/directory
 
-            XmlNode TryNode = Host.GetPrimaryDisk().GetNodeFromPath(Path);
+            XmlNode TryNode = Host.GetSystemDrive().GetNodeFromPath(Path);
 
             if (TryNode is null)
 			{
@@ -338,9 +338,9 @@ namespace Lawful
 				{
                     case "D":
                     case "DISK":
-                        for (int i = 0; i < Player.ConnectionInfo.PC.Disks.Count; i++)
+                        for (int i = 0; i < Player.ConnectionInfo.PC.Drives.Count; i++)
                         {
-                            PhysicalDisk Disk = Player.ConnectionInfo.PC.Disks[i];
+                            PhysicalDrive Disk = Player.ConnectionInfo.PC.Drives[i];
 
                             Console.Write($"Disk {i} :: ");
 							Console.Write($"{ Disk.Root.SelectNodes("Directory").Count} {(Disk.Root.SelectNodes("Directory").Count == 1 ? "folder" : "folders")}, ");
@@ -352,7 +352,7 @@ namespace Lawful
                             Console.Write("    Label : ");
                             Util.WriteLineColor(Disk.Label, ConsoleColor.Yellow);
 
-                            if (i != Player.ConnectionInfo.PC.Disks.Count - 1)
+                            if (i != Player.ConnectionInfo.PC.Drives.Count - 1)
 							    Console.WriteLine();
                         }
                         return;
@@ -537,7 +537,7 @@ namespace Lawful
 			if (Query.Length == 0) { return null; }
 
             if (Query[0] == '/')
-                return Player.ConnectionInfo.Disk.GetNodeFromPath(Query);
+                return Player.ConnectionInfo.Drive.GetNodeFromPath(Query);
             else
                 return Player.ConnectionInfo.PathNode.GetNodeFromPath(Query);
 		}
@@ -614,7 +614,7 @@ namespace Lawful
                 return;
 			}
 
-            PhysicalDisk Disk = Player.ConnectionInfo.PC.GetDisk(Query.Arguments[0]);
+            PhysicalDrive Disk = Player.ConnectionInfo.PC.GetDisk(Query.Arguments[0]);
 
             if (Disk is null)
 			{
@@ -622,7 +622,7 @@ namespace Lawful
                 return;
 			}
 
-            Player.ConnectionInfo.Disk = Disk;
+            Player.ConnectionInfo.Drive = Disk;
             Player.ConnectionInfo.PathNode = Disk.Root;
 
         }

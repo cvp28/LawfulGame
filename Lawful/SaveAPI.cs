@@ -54,8 +54,8 @@ namespace Lawful
 
 				User.ConnectionInfo.PC = User.HomePC;
 				User.ConnectionInfo.User = User.Account;
-				User.ConnectionInfo.Disk = User.HomePC.GetPrimaryDisk();
-				User.ConnectionInfo.PathNode = User.ConnectionInfo.Disk.Root;
+				User.ConnectionInfo.Drive = User.HomePC.GetSystemDrive();
+				User.ConnectionInfo.PathNode = User.ConnectionInfo.Drive.Root;
 
 				User.SerializeToFile($@"{PathToNewSaveFolder}\User.xml");
 

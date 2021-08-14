@@ -400,7 +400,7 @@ namespace Lawful
                     return;
             }
 
-            XmlNode TryExecuteBin = Player.ConnectionInfo.PC.GetPrimaryDisk().GetNodeFromPath($"bin/{Query.Command}");
+            XmlNode TryExecuteBin = Player.ConnectionInfo.PC.GetSystemDrive().GetNodeFromPath($"bin/{Query.Command}");
             XmlNode TryExecuteLocal = NodeLocator.LocalLocate(Query.Command, in Player.ConnectionInfo);
             XmlNode TryExecute;
 
@@ -416,7 +416,7 @@ namespace Lawful
                 goto ExecuteCommand;
             }
 
-            Console.WriteLine($"File not found '{Query.Command}'");
+            Console.WriteLine($"File not found '/bin/{Query.Command}' and './{Query.Command}'");
             return;
 
             ExecuteCommand:
@@ -504,8 +504,8 @@ namespace Lawful
                     }
                     Player.ConnectionInfo.PC = Player.HomePC;
                     Player.ConnectionInfo.User = Player.HomePC.GetUser(Player.ProfileName);
-                    Player.ConnectionInfo.Disk = Player.HomePC.GetPrimaryDisk();
-                    Player.ConnectionInfo.PathNode = Player.HomePC.GetPrimaryDisk().Root;
+                    Player.ConnectionInfo.Drive = Player.HomePC.GetSystemDrive();
+                    Player.ConnectionInfo.PathNode = Player.HomePC.GetSystemDrive().Root;
                     Console.WriteLine("Disconnected");
                     break;
 

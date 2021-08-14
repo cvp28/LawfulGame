@@ -62,7 +62,7 @@ namespace Lawful
 			string Path;
 
 			XmlNode Traverser;
-			PhysicalDisk TryDisk;
+			PhysicalDrive TryDisk;
 
 			if (EvaluateDisk)
 			{
@@ -77,7 +77,7 @@ namespace Lawful
 			}
 			else
 			{
-				TryDisk = ConnectionInfo.Disk;
+				TryDisk = ConnectionInfo.Drive;
 				Path = Query;
 				StartAtRoot = Path[0] == '/';
 			}
@@ -103,7 +103,7 @@ namespace Lawful
 			bool EvaluateDisk = QueryElements.Length >= 3;
 
 			Computer TryPC = Computers.GetComputer(Hostname);
-			PhysicalDisk TryDisk;
+			PhysicalDrive TryDisk;
 
 			if (EvaluateDisk)
 			{
@@ -115,7 +115,7 @@ namespace Lawful
 			}
 			else
 			{
-				TryDisk = TryPC.GetPrimaryDisk();
+				TryDisk = TryPC.GetSystemDrive();
 				Path = QueryElements[1];
 			}
 

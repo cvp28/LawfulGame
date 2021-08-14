@@ -20,8 +20,8 @@ namespace Lawful.GameObjects
 		[XmlElement("Account")]
 		public List<UserAccount> Accounts;
 
-		[XmlElement("Disk")]
-		public List<PhysicalDisk> Disks;
+		[XmlElement("Drive")]
+		public List<PhysicalDrive> Drives;
 
 		public Computer() { }
 
@@ -35,7 +35,7 @@ namespace Lawful.GameObjects
 			Accounts = new();
 			Accounts.Add(new UserAccount("root", String.Empty));
 
-			Disks = new();
+			Drives = new();
 		}
 
 		public Computer(string Name, string Address, string RootPassword)
@@ -48,31 +48,31 @@ namespace Lawful.GameObjects
 			Accounts = new();
 			Accounts.Add(new("root", RootPassword));
 
-			Disks = new();
+			Drives = new();
 		}
 
-		public PhysicalDisk GetPrimaryDisk() => Disks.FirstOrDefault(disk => disk.Type == PhysicalDiskType.Primary);
+		public PhysicalDrive GetSystemDrive() => Drives.FirstOrDefault(disk => disk.Type == PhysicalDriveType.System);
 
-		public PhysicalDisk GetDisk(string Label) => Disks.FirstOrDefault(disk => disk.Label == Label);
+		public PhysicalDrive GetDisk(string Label) => Drives.FirstOrDefault(disk => disk.Label == Label);
 
-		public bool HasDisk(string Label) => Disks.Any(disk => disk.Label == Label);
+		public bool HasDisk(string Label) => Drives.Any(disk => disk.Label == Label);
 
-		public bool AddDisk(PhysicalDisk Disk)
+		public bool AddDisk(PhysicalDrive Disk)
 		{
-			if (Disks.Any(disk => disk.Label == Disk.Label)) { return false; }
-			if (Disks.Any(disk => disk.Type == PhysicalDiskType.Primary) && Disk.Type == PhysicalDiskType.Primary) { return false; }
+			if (Drives.Any(disk => disk.Label == Disk.Label)) { return false; }
+			if (Drives.Any(disk => disk.Type == PhysicalDriveType.System) && Disk.Type == PhysicalDriveType.System) { return false; }
 
-			Disks.Add(Disk);
+			Drives.Add(Disk);
 			return true;
 		}
 
 		public bool RemoveDisk(string Label)
 		{
-			PhysicalDisk Disk = Disks.FirstOrDefault(disk => disk.Label == Label);
+			PhysicalDrive Disk = Drives.FirstOrDefault(disk => disk.Label == Label);
 
 			if (Disk is null) { return false; }
 
-			Disks.Remove(Disk);
+			Drives.Remove(Disk);
 
 			return true;
 		}

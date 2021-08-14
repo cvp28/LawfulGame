@@ -10,7 +10,7 @@ namespace Lawful.GameObjects
 
         public XmlNode PathNode;
 
-        public PhysicalDisk Disk;
+        public PhysicalDrive Drive;
 
         public UserAccount User;
     }

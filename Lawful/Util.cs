@@ -10,7 +10,7 @@ namespace Lawful
 		public static void PrintPrompt()
 		{
 			Console.WriteLine($"/ [{Player.ConnectionInfo.User.Username} @ {Player.ConnectionInfo.PC.Address}]");
-			Console.Write($"\\ [{Player.ConnectionInfo.Disk.Label}] {Player.ConnectionInfo.Path} > ");
+			Console.Write($"\\ [{Player.ConnectionInfo.Drive.Label}] {Player.ConnectionInfo.Path} > ");
 		}
 
 		public static void WriteColor(string text, ConsoleColor color)

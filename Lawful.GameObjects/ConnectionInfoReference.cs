@@ -31,10 +31,10 @@ namespace Lawful.GameObjects
 		}
 
 
-		[XmlAttribute("DiskLabel")]
-		public string StoredDiskLabel
+		[XmlAttribute("DriveLabel")]
+		public string StoredDriveLabel
 		{
-			get { return PlayerReference.ConnectionInfo.Disk.Label; }
+			get { return PlayerReference.ConnectionInfo.Drive.Label; }
 			set { ReferenceLabel = value; }
 		}
 

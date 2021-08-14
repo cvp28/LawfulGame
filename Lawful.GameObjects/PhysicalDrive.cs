@@ -6,28 +6,34 @@ using System.Text;
 
 namespace Lawful.GameObjects
 {
-	public enum PhysicalDiskType
+	public enum PhysicalDriveType
 	{
-		[XmlEnum("Primary")]
-		Primary,
+		[XmlEnum("Sytem")]
+		System,
 
-		[XmlEnum("Secondary")]
-		Secondary
+		[XmlEnum("Regular")]
+		Regular,
+
+		[XmlEnum("UserSpecific")]
+		UserSpecific
 	}
 
-	public class PhysicalDisk
+	public class PhysicalDrive
 	{
 		[XmlAttribute("Type")]
-		public PhysicalDiskType Type;
+		public PhysicalDriveType Type;
 
 		[XmlAttribute("Label")]
 		public string Label;
 
+		[XmlAttribute("Owner")]
+		public string Owner;
+
 		public XmlNode Root;
 
-		public PhysicalDisk() { }
+		public PhysicalDrive() { }
 
-		public PhysicalDisk(PhysicalDiskType Type, string Label)
+		public PhysicalDrive(PhysicalDriveType Type, string Label)
 		{
 			this.Type = Type;
 			this.Label = Label;
@@ -40,7 +46,7 @@ namespace Lawful.GameObjects
 		/// <param name="Type">Type of disk</param>
 		/// <param name="Label">Label of disk</param>
 		/// <param name="PathToFileSystemDocument">Path to the XML document containing the FileSystem for this PhysicalDisk</param>
-		public PhysicalDisk(PhysicalDiskType Type, string Label, string PathToFileSystemDocument)
+		public PhysicalDrive(PhysicalDriveType Type, string Label, string PathToFileSystemDocument)
 		{
 			this.Type = Type;
 			this.Label = Label;
