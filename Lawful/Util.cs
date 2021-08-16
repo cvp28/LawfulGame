@@ -9,8 +9,23 @@ namespace Lawful
 	{
 		public static void PrintPrompt()
 		{
-			Console.WriteLine($"/ [{Player.ConnectionInfo.User.Username} @ {Player.ConnectionInfo.PC.Address}]");
-			Console.Write($"\\ [{Player.ConnectionInfo.Drive.Label}] {Player.ConnectionInfo.Path} > ");
+			Console.Write("/ [");
+			WriteColor(Player.ConnectionInfo.User.Username, ConsoleColor.Green);
+			Console.Write("] [");
+			WriteColor(Player.ConnectionInfo.PC.Address, ConsoleColor.Green);
+			Console.WriteLine(']');
+
+			Console.Write("\\ [");
+			if (Player.ConnectionInfo.User.HasSecretsDrive)
+				WriteColor(Player.ConnectionInfo.Drive.Label, Player.ConnectionInfo.Drive == Player.ConnectionInfo.User.SecretsDrive ? ConsoleColor.Red : Console.ForegroundColor);
+			else
+				Console.Write(Player.ConnectionInfo.Drive.Label);
+			Console.Write("] ");
+
+			Console.Write($"{Player.ConnectionInfo.Path} > ");
+
+			//	Console.Write($"\\ [{Player.ConnectionInfo.Drive.Label}] {Player.ConnectionInfo.Path} > ");
+			//	Console.WriteLine($"/ [{Player.ConnectionInfo.User.Username} @ {Player.ConnectionInfo.PC.Address}]");
 		}
 
 		public static void WriteColor(string text, ConsoleColor color)

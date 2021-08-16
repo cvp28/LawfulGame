@@ -7,7 +7,14 @@ ComputerStructure cs = new();
 Computer main = new("REPLACETHIS", "117.92.201.6", "root");
 Computer bedroom_link = new("bedroom_link", "172.116.23.251", "entropy");
 
-main.AddUser(new("REPLACETHIS", string.Empty));
+UserAccount Player = new("REPLACETHIS", string.Empty);
+
+PhysicalDrive UserSecretsDrive = new(PhysicalDriveType.Regular, Player.Username);
+UserSecretsDrive.ImportFileSystemFromDisk(@".\UserSecretsDrive.xml");
+
+Player.SecretsDrive = UserSecretsDrive;
+
+main.AddUser(Player);
 main.AddUser(new("www-root", string.Empty));
 
 main.AddDisk(new(PhysicalDriveType.System, "Main", @".\Apollo-PC_Main.xml"));

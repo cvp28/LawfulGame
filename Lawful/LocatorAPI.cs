@@ -68,9 +68,18 @@ namespace Lawful
 			{
 				string[] QueryElements = Query.Split(':');
 
-				TryDisk = ConnectionInfo.PC.GetDisk(QueryElements[0]);
-				Path = QueryElements[1];
-				StartAtRoot = true;
+				if (ConnectionInfo.User.HasSecretsDrive && QueryElements[0] == ConnectionInfo.User.SecretsDrive.Label)
+				{
+					TryDisk = ConnectionInfo.User.SecretsDrive;
+					Path = QueryElements[1];
+					StartAtRoot = true;
+				}
+				else
+				{
+					TryDisk = ConnectionInfo.PC.GetDisk(QueryElements[0]);
+					Path = QueryElements[1];
+					StartAtRoot = true;
+				}
 
 				if (TryDisk is null)
 					return null;
@@ -90,36 +99,32 @@ namespace Lawful
 			return Locate(Path, Traverser);
 		}
 
-		public static dynamic RemoteLocate(string Query)
+		public static dynamic RemoteLocate(string Query, in ConnectionInfo ConnectionInfo)
 		{
 			string[] QueryElements = Query.Split(':', StringSplitOptions.RemoveEmptyEntries);
-			string[] RSIElements = QueryElements[0].Split('@', StringSplitOptions.RemoveEmptyEntries);
-
-			string Username = RSIElements[0];
-			string Hostname = RSIElements[1];
-
 			string Path;
 
 			bool EvaluateDisk = QueryElements.Length >= 3;
 
-			Computer TryPC = Computers.GetComputer(Hostname);
-			PhysicalDrive TryDisk;
-
 			if (EvaluateDisk)
 			{
-				TryDisk = TryPC.GetDisk(QueryElements[1]);
+				if (ConnectionInfo.User.HasSecretsDrive && QueryElements[1] == ConnectionInfo.User.SecretsDrive.Label)
+					ConnectionInfo.Drive = ConnectionInfo.User.SecretsDrive;
+				else
+					ConnectionInfo.Drive = ConnectionInfo.PC.GetDisk(QueryElements[1]);
+
 				Path = QueryElements[2];
 
-				if (TryDisk is null)
+				if (ConnectionInfo.Drive is null)
 					return null;
 			}
 			else
 			{
-				TryDisk = TryPC.GetSystemDrive();
+				ConnectionInfo.Drive = ConnectionInfo.PC.GetSystemDrive();
 				Path = QueryElements[1];
 			}
 
-			return Locate(Path, TryDisk.Root);
+			return Locate(Path, ConnectionInfo.Drive.Root);
 		}
 
 		public static dynamic Locate(string Path, XmlNode Traverser)

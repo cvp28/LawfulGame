@@ -30,10 +30,10 @@ namespace Lawful.GameObjects
 		/// </summary>
 		[XmlAttribute("Username")]
 		public string Username { get { return Account.Username; } set { ReferenceUsername = value; } }
-	
+
 		[XmlAttribute("StoryID")]
 		public string StoryID { get; set; }
-	
+
 		[XmlAttribute("CurrentMissionID")]
 		public string CurrentMissionID { get; set; }
 

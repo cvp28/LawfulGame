@@ -12,10 +12,7 @@ namespace Lawful.GameObjects
 		System,
 
 		[XmlEnum("Regular")]
-		Regular,
-
-		[XmlEnum("UserSpecific")]
-		UserSpecific
+		Regular
 	}
 
 	public class PhysicalDrive
@@ -25,9 +22,6 @@ namespace Lawful.GameObjects
 
 		[XmlAttribute("Label")]
 		public string Label;
-
-		[XmlAttribute("Owner")]
-		public string Owner;
 
 		public XmlNode Root;
 

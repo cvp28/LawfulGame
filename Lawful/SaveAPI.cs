@@ -46,6 +46,9 @@ namespace Lawful
 				UserPC.Name = UserPCName;
 				UserAccount.Username = UserProfileName;
 
+				if (UserAccount.HasSecretsDrive)
+					UserAccount.SecretsDrive.Label = UserAccount.Username;
+
 				Computers.SerializeToFile($@"{PathToNewSaveFolder}\Computers.xml");
 
 				// Do some initialization on the User object now that we have the ComputerStructure loaded in and then serialize that to the user's save folder

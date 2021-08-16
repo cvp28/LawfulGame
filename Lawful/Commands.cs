@@ -342,9 +342,12 @@ namespace Lawful
                         {
                             PhysicalDrive Disk = Player.ConnectionInfo.PC.Drives[i];
 
+                            int DirectoryCount = Disk.Root.SelectNodes("Directory").Count;
+                            int FileCount = Disk.Root.SelectNodes("File").Count;
+
                             Console.Write($"Disk {i} :: ");
-							Console.Write($"{ Disk.Root.SelectNodes("Directory").Count} {(Disk.Root.SelectNodes("Directory").Count == 1 ? "folder" : "folders")}, ");
-							Console.WriteLine($"{ Disk.Root.SelectNodes("File").Count} {(Disk.Root.SelectNodes("File").Count == 1 ? "file" : "files")} in root");
+							Console.Write($"{DirectoryCount} {(DirectoryCount == 1 ? "folder" : "folders")}, ");
+							Console.WriteLine($"{FileCount} {(FileCount == 1 ? "file" : "files")} in root");
 
                             Console.Write("    Type  : ");
                             Util.WriteLineColor(Disk.Type.ToString(), ConsoleColor.Yellow);
@@ -354,6 +357,20 @@ namespace Lawful
 
                             if (i != Player.ConnectionInfo.PC.Drives.Count - 1)
 							    Console.WriteLine();
+                        }
+                        if (Player.ConnectionInfo.User.HasSecretsDrive)
+						{
+							int DirectoryCount = Player.ConnectionInfo.User.SecretsDrive.Root.SelectNodes("Directory").Count;
+                            int FileCount = Player.ConnectionInfo.User.SecretsDrive.Root.SelectNodes("File").Count;
+
+							Console.WriteLine();
+							Util.WriteColor("[Current User has a Secrets Drive]", ConsoleColor.Yellow);
+                            Console.Write(" :: ");
+
+                            Console.Write($"{DirectoryCount} {(DirectoryCount == 1 ? "folder" : "folders")}, ");
+                            Console.WriteLine($"{FileCount} {(FileCount == 1 ? "file" : "files")} in root");
+
+							Console.WriteLine();
                         }
                         return;
 				}
@@ -614,7 +631,12 @@ namespace Lawful
                 return;
 			}
 
-            PhysicalDrive Disk = Player.ConnectionInfo.PC.GetDisk(Query.Arguments[0]);
+            PhysicalDrive Disk;
+
+            if (Player.ConnectionInfo.User.HasSecretsDrive && Query.Arguments[0] == Player.ConnectionInfo.User.SecretsDrive.Label)
+                Disk = Player.ConnectionInfo.User.SecretsDrive;
+            else
+                Disk = Player.ConnectionInfo.PC.GetDisk(Query.Arguments[0]);
 
             if (Disk is null)
 			{

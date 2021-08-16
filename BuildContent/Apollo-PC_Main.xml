@@ -29,7 +29,6 @@ This is a test document
 	<Directory Name="bin">
 		<File Name="ssh" Command="ssh"/>
 		<File Name="su" Command="su"/>
-		<File Name="scan" Command="scan"/>
 		<File Name="ls" Command="ls"/>
 		<File Name="cd" Command="cd"/>
 		<File Name="mv" Command="mv"/>
