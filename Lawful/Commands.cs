@@ -338,39 +338,23 @@ namespace Lawful
 				{
                     case "D":
                     case "DISK":
-                        for (int i = 0; i < Player.ConnectionInfo.PC.Drives.Count; i++)
+                        if (Player.ConnectionInfo.User.Username == "root")
+                            DisplayDisksAsRoot();
+                        else
                         {
-                            PhysicalDrive Disk = Player.ConnectionInfo.PC.Drives[i];
+                            DisplayDisks();
+                            if (Player.ConnectionInfo.User.HasSecretsDrive)
+                            {
+                                int DirectoryCount = Player.ConnectionInfo.User.SecretsDrive.Root.SelectNodes("Directory").Count;
+                                int FileCount = Player.ConnectionInfo.User.SecretsDrive.Root.SelectNodes("File").Count;
 
-                            int DirectoryCount = Disk.Root.SelectNodes("Directory").Count;
-                            int FileCount = Disk.Root.SelectNodes("File").Count;
+                                Console.WriteLine();
+                                Util.WriteColor("[Current User has a Secrets Drive]", ConsoleColor.Yellow);
+                                Console.Write(" :: ");
 
-                            Console.Write($"Disk {i} :: ");
-							Console.Write($"{DirectoryCount} {(DirectoryCount == 1 ? "folder" : "folders")}, ");
-							Console.WriteLine($"{FileCount} {(FileCount == 1 ? "file" : "files")} in root");
-
-                            Console.Write("    Type  : ");
-                            Util.WriteLineColor(Disk.Type.ToString(), ConsoleColor.Yellow);
-
-                            Console.Write("    Label : ");
-                            Util.WriteLineColor(Disk.Label, ConsoleColor.Yellow);
-
-                            if (i != Player.ConnectionInfo.PC.Drives.Count - 1)
-							    Console.WriteLine();
-                        }
-                        if (Player.ConnectionInfo.User.HasSecretsDrive)
-						{
-							int DirectoryCount = Player.ConnectionInfo.User.SecretsDrive.Root.SelectNodes("Directory").Count;
-                            int FileCount = Player.ConnectionInfo.User.SecretsDrive.Root.SelectNodes("File").Count;
-
-							Console.WriteLine();
-							Util.WriteColor("[Current User has a Secrets Drive]", ConsoleColor.Yellow);
-                            Console.Write(" :: ");
-
-                            Console.Write($"{DirectoryCount} {(DirectoryCount == 1 ? "folder" : "folders")}, ");
-                            Console.WriteLine($"{FileCount} {(FileCount == 1 ? "file" : "files")} in root");
-
-							Console.WriteLine();
+                                Console.Write($"{DirectoryCount} {(DirectoryCount == 1 ? "folder" : "folders")}, ");
+                                Console.WriteLine($"{FileCount} {(FileCount == 1 ? "file" : "files")} in root");
+                            }
                         }
                         return;
 				}
@@ -400,7 +384,6 @@ namespace Lawful
 						Console.WriteLine($"Could not resolve query: '{Query.Arguments[0]}'");
                         break;
 				}
-
             }
 
 			if (NodeToList.Name == "File")
@@ -439,6 +422,51 @@ namespace Lawful
                     else
                         Console.WriteLine(File.Attributes["Name"].Value);
             }
+        }
+
+        private static void DisplayDisks()
+		{
+            for (int i = 0; i < Player.ConnectionInfo.PC.Drives.Count; i++)
+            {
+                PhysicalDrive Disk = Player.ConnectionInfo.PC.Drives[i];
+
+                int DirectoryCount = Disk.Root.SelectNodes("Directory").Count;
+                int FileCount = Disk.Root.SelectNodes("File").Count;
+
+                Console.Write($"Disk {i} :: ");
+                Console.Write($"{DirectoryCount} {(DirectoryCount == 1 ? "folder" : "folders")}, ");
+                Console.WriteLine($"{FileCount} {(FileCount == 1 ? "file" : "files")} in root");
+
+                Console.Write("    Type  : ");
+                Util.WriteLineColor(Disk.Type.ToString(), ConsoleColor.Yellow);
+
+                Console.Write("    Label : ");
+                Util.WriteLineColor(Disk.Label, ConsoleColor.Yellow);
+
+                if (i != Player.ConnectionInfo.PC.Drives.Count - 1)
+                    Console.WriteLine();
+            }
+        }
+
+        private static void DisplayDisksAsRoot()
+        {
+            DisplayDisks();
+
+            foreach (UserAccount Account in Player.ConnectionInfo.PC.Accounts)
+			{
+                if (Account.HasSecretsDrive)
+				{
+                    int DirectoryCount = (int)(Account.SecretsDrive.Root.SelectNodes("Directory")?.Count);
+                    int FileCount = (int)(Account.SecretsDrive.Root.SelectNodes("File")?.Count);
+
+                    Console.WriteLine();
+                    Util.WriteColor($"[User: '{Account.Username}' has a Secrets Drive]", ConsoleColor.Yellow);
+                    Console.Write(" :: ");
+
+                    Console.Write($"{DirectoryCount} {(DirectoryCount == 1 ? "folder" : "folders")}, ");
+                    Console.WriteLine($"{FileCount} {(FileCount == 1 ? "file" : "files")} in root");
+                }
+			}
         }
 
         public static void CD(InputQuery Query)
