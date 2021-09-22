@@ -11,3 +11,7 @@ C:\Users\Carson\source\repos\LawfulGame\Missions\shouldersofgiants\obj\Release\n
 C:\Users\Carson\source\repos\LawfulGame\Missions\shouldersofgiants\obj\Release\net5.0\shouldersofgiants.dll
 C:\Users\Carson\source\repos\LawfulGame\Missions\shouldersofgiants\obj\Release\net5.0\ref\shouldersofgiants.dll
 C:\Users\Carson\source\repos\LawfulGame\Missions\shouldersofgiants\obj\Release\net5.0\shouldersofgiants.pdb
+C:\Users\Carson\source\repos\LawfulGame\Content\Story\Lawful\Missions\shouldersofgiants\net5.0\Lawful.deps.json
+C:\Users\Carson\source\repos\LawfulGame\Content\Story\Lawful\Missions\shouldersofgiants\net5.0\Lawful.runtimeconfig.json
+C:\Users\Carson\source\repos\LawfulGame\Content\Story\Lawful\Missions\shouldersofgiants\net5.0\Lawful.runtimeconfig.dev.json
+C:\Users\Carson\source\repos\LawfulGame\Content\Story\Lawful\Missions\shouldersofgiants\net5.0\Lawful.exe

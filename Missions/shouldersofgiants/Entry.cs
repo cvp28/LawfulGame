@@ -32,9 +32,10 @@ namespace Lawful.Mission
 			switch (e.Query.Command.ToUpper())
 			{
 				case "SUS":
-					Data.OverrideCommand = true;	// Tells the game not to handle the user's query when we return from this event handler.
+					Data.OverrideCommand = true;    // Tells the game not to handle the user's query when we return from this event handler.
 													// Basically, this is a way to override commands
-					Console.WriteLine("Sussy");
+					Util.WriteDynamicColor("Sussy", 50, ConsoleColor.Red);
+					Console.WriteLine();
 					break;
 			}
 		}

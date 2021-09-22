@@ -55,6 +55,46 @@ namespace Lawful
 			return RSIStatus.Complete;
 		}
 
+		// TODO (Carson): Implement the Locate method which automates determining whether or not to call LocalLocate or RemoteLocate for any given query and handles things like logins internally
+		//	public static dynamic Locate(string Query, bool LocalLocateNoDiskChange = false, bool PrintErrors = false)
+		//	{
+		//		RSIStatus QueryRSIStatus = GetRSIStatus(Query);
+		//	
+		//		switch (QueryRSIStatus)
+		//		{
+		//			case RSIStatus.None:
+		//				return LocalLocate(Query, in Player.ConnectionInfo, LocalLocateNoDiskChange);
+		//	
+		//			case RSIStatus.InvalidIP:
+		//				if (PrintErrors)
+		//					Console.WriteLine("Invalid IP address in query");
+		//				return null;
+		//	
+		//			case RSIStatus.NonResolving:
+		//				if (PrintErrors)
+		//					Console.WriteLine("Could not locate machine by that IP address");
+		//				return null;
+		//	
+		//			case RSIStatus.Resolves:
+		//				if (PrintErrors)
+		//					Console.WriteLine("Referenced machine does not contain the specified user");
+		//				return null;
+		//	
+		//			case RSIStatus.Complete:
+		//	
+		//				//return RemoteLocate(Query, )
+		//				return null;
+		//	
+		//			case RSIStatus.Redundant:
+		//				Console.WriteLine("Already connected to that machine");
+		//				return null;
+		//		}
+		//	}
+
+		// The difference between LocalLocate and RemoteLocate is that...
+		// LocalLocate will parse the input query as being either of a [disklabel]:[path] format or a [path] format
+		// RemoteLocate will expect an RSI at the start of the query and therefore is desgined to parse a [username]@[hostname]:[disklabel]:[path] format or a [username]@[hostname]:[path] format with the disk being implied
+
 		public static dynamic LocalLocate(string Query, in ConnectionInfo ConnectionInfo, bool NoDiskChange = false)
 		{
 			bool StartAtRoot;
@@ -69,20 +109,15 @@ namespace Lawful
 				string[] QueryElements = Query.Split(':');
 
 				if (ConnectionInfo.User.HasSecretsDrive && QueryElements[0] == ConnectionInfo.User.SecretsDrive.Label)
-				{
 					TryDisk = ConnectionInfo.User.SecretsDrive;
-					Path = QueryElements[1];
-					StartAtRoot = true;
-				}
 				else
-				{
 					TryDisk = ConnectionInfo.PC.GetDisk(QueryElements[0]);
-					Path = QueryElements[1];
-					StartAtRoot = true;
-				}
 
 				if (TryDisk is null)
 					return null;
+
+				Path = QueryElements[1];
+				StartAtRoot = true;
 			}
 			else
 			{
@@ -96,8 +131,16 @@ namespace Lawful
 			else
 				Traverser = ConnectionInfo.PathNode;
 
-			return Locate(Path, Traverser);
+			return LocateNode(Path, Traverser);
 		}
+
+		// RemoteLocate only requires that the PC and User fields of the ConnectionInfo structure being passed in are filled out
+		// It will automatically determine how to fill out the Drive field based on what is present in the query
+		// PathNode is not utilized
+		//
+		// Yes, this is a shit API.
+		// Yes, it works.
+		// No, I do not care.
 
 		public static dynamic RemoteLocate(string Query, in ConnectionInfo ConnectionInfo)
 		{
@@ -113,10 +156,10 @@ namespace Lawful
 				else
 					ConnectionInfo.Drive = ConnectionInfo.PC.GetDisk(QueryElements[1]);
 
-				Path = QueryElements[2];
-
 				if (ConnectionInfo.Drive is null)
 					return null;
+
+				Path = QueryElements[2];
 			}
 			else
 			{
@@ -124,10 +167,10 @@ namespace Lawful
 				Path = QueryElements[1];
 			}
 
-			return Locate(Path, ConnectionInfo.Drive.Root);
+			return LocateNode(Path, ConnectionInfo.Drive.Root);
 		}
 
-		public static dynamic Locate(string Path, XmlNode Traverser)
+		public static dynamic LocateNode(string Path, XmlNode Traverser)
 		{
 			string[] PathElements = Path.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
@@ -144,12 +187,10 @@ namespace Lawful
 							return Traverser.ChildNodes;
 
 					case "..":
-						XmlNode TryParent = Traverser.ParentNode;
-
 						if (Traverser.Name == "Root")
 							return null;
 
-						Traverser = TryParent;
+						Traverser = Traverser.ParentNode;
 
 						break;
 

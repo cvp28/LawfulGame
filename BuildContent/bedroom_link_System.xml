@@ -37,5 +37,6 @@ This is a test document
 		<File Name="clear" Command="clear"/>
 		<File Name="dc" Command="dc"/>
 		<File Name="pwd" Command="pwd"/>
+		<File Name="scp" Command="scp"/>
 	</Directory>
 </Root>

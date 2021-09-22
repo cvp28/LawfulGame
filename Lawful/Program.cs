@@ -368,6 +368,9 @@ namespace Lawful
         {
             // process built-in commands first
 
+            if (Query.Command.Length == 0)
+                return;
+
             switch (Query.Command.ToUpper())
 			{
                 case "EXIT":
@@ -379,13 +382,18 @@ namespace Lawful
                         Console.WriteLine(NodeLocator.GetRSIStatus(Query.Arguments[0]));
                     return;
 
-                case "CURRENTMISSION":
-                    Console.WriteLine(CurrentMissionAssembly.FullName);
-					Console.WriteLine(CurrentMissionAssembly.Location);
+                case "OSCP":
+                    Commands.OtherSecureCopy(Query);
                     return;
 
-                case "SCP":
-                    Commands.SecureCopy(Query);
+                case "MKDIR":
+                case "MD":
+                    Commands.MakeDirectory(Query);
+                    return;
+
+                case "CURRENTMISSION":
+					Console.WriteLine($"\"{CurrentMission.Name}\"");
+					Console.WriteLine($" Assembly ({CurrentMissionAssembly.FullName}) at {CurrentMissionAssembly.Location}");
                     return;
             }
 

@@ -158,6 +158,218 @@ namespace Lawful
         private static List<IPAddress> ConnectedHosts = new();
         private static List<string> LoggedInUsers = new();
 
+        private static List<Computer> ConnectedPCs = new();
+        private static List<UserAccount> LoggedInAccounts = new();
+
+        public static void OtherSecureCopy(InputQuery Query)
+		{
+            if (Query.Arguments.Count == 0)
+			{
+				Console.WriteLine("Insufficient arguments");
+                return;
+			}
+
+            if (Query.Arguments.Count == 1)
+			{
+                (bool Succeeded, dynamic Source) Arg1 = HandleOtherSCPArg(Query.Arguments[0]);
+
+                XmlNode UserDir = Player.HomePC.GetSystemDrive().GetNodeFromPath($"/home/{Player.ProfileName}");
+                XmlNode UserBin = Player.HomePC.GetSystemDrive().GetNodeFromPath("/bin");
+
+                if (!Arg1.Succeeded) // The argument handler already prints our error messages for us so we just have to return
+                    return;
+
+                switch (Arg1.Source)
+				{
+                    case XmlNode n:
+                        if (n.Attributes["Command"] is not null)
+                            AnimatedFileTransfer(n, UserBin);
+                        else
+                            AnimatedFileTransfer(n, UserDir);
+                        break;
+
+                    case XmlNodeList nl:
+                        foreach (XmlNode n in nl)
+						{
+                            if (n.Attributes["Command"] is not null)
+                                AnimatedFileTransfer(n, UserBin);
+                            else
+                                AnimatedFileTransfer(n, UserDir);
+                        }
+                        break;
+				}
+			}
+            else
+			{
+                (bool Succeeded, dynamic Source) Arg1 = HandleOtherSCPArg(Query.Arguments[0]);
+                (bool Succeeded, dynamic Source) Arg2 = HandleOtherSCPArg(Query.Arguments[1]);
+
+                if (!Arg1.Succeeded || !Arg2.Succeeded)
+                    return;
+
+                // Sort out the destination
+                switch (Arg2.Source)
+				{
+                    case XmlNode n:
+                        if (n.Name != "Directory" && n.Name != "Root")
+                            goto default;       // Handly little feature, I must say
+                        break;
+
+                    default:
+						Console.WriteLine("Invalid destination, must be a folder");
+                        break;
+				}
+
+                // Sort out the source
+                switch (Arg1.Source)
+                {
+                    case XmlNode n:
+                        AnimatedFileTransfer(n, Arg2.Source);
+                        break;
+
+                    case XmlNodeList nl:
+                        foreach (XmlNode n in nl)
+                            AnimatedFileTransfer(n, Arg2.Source);
+                        break;
+                }
+            }
+            ConnectedPCs.Clear();
+            LoggedInAccounts.Clear();
+		}
+
+        public static void AnimatedFileTransfer(XmlNode Source, XmlNode Destination)
+		{
+            Console.CursorVisible = false;
+
+            Util.WriteColor($"{Source.Attributes["Name"].Value, -40} -> {Destination.GetPath()} ", ConsoleColor.Yellow);
+
+            XmlNode ToCopy = Source.Clone();
+            Destination.AppendChild(ToCopy);
+
+            Util.BeginSpinningCursorAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 25, 150, 20, Console.GetCursorPosition());
+            Util.WriteLineColor("√", ConsoleColor.Green);
+
+            Console.CursorVisible = true;
+        }
+
+        public static (bool, dynamic) HandleOtherSCPArg(string Argument)
+		{
+            // first we're going to determine the type of query
+            RSIStatus QueryRSIStatus = NodeLocator.GetRSIStatus(Argument);
+
+            dynamic Source;
+
+            switch (QueryRSIStatus)
+            {
+                case RSIStatus.None:
+                    // local query, use LocalLocate
+                    Source = NodeLocator.LocalLocate(Argument, in Player.ConnectionInfo);
+                    break;
+
+                case RSIStatus.Complete:
+                    // remote query, use RemoteLocate with new ConnectionInfo
+                    string RSI = Argument.Split(':')[0];
+                    string[] RSIElements = RSI.Split('@');
+
+                    Computer PC = Computers.GetComputer(RSIElements[1]);
+
+                    if (!ConnectedPCs.Contains(PC)) // If we do not already have an active session on this computer, create one.
+                    {
+                        ConnectedPCs.Add(PC);
+						Console.WriteLine($"Connected to {PC.Name}@{PC.Address}");
+                    }
+
+                    UserAccount Account = PC.GetUser(RSIElements[0]);
+
+                    if (!LoggedInAccounts.Contains(Account))    // If we are not already logged in to this particular account, log in.
+					{
+                        if (Account.Password.Length > 0)
+                        {
+                            string Password = String.Empty;
+
+                            do
+                            {
+                                Console.WriteLine($"Password for '{Account.Username}': ");
+                                Password = Util.ReadLineSecret();
+
+                                if (Password == "$cancel")
+                                    return (false, null);
+                            }
+                            while (Password != Account.Password);
+
+                            LoggedInAccounts.Add(Account);
+                        }
+                    }
+
+                    ConnectionInfo New = new() { PC = Computers.GetComputer(RSIElements[1]), User = Account };
+                    Source = NodeLocator.RemoteLocate(Argument, in New);
+                    break;
+
+                default:
+                    Console.WriteLine($"Error in query '{QueryRSIStatus}'");
+                    return (false, null);
+            }
+
+            switch (Source)
+            {
+                case XmlNode n:
+                    return (true, n);
+
+                case XmlNodeList nl:
+                    return (true, nl);
+
+                default:
+                    Console.WriteLine($"Unable to resolve source query '{Argument}'");
+                    return (false, null);
+            }
+        }
+
+        public static void MakeDirectory(InputQuery Query)
+		{
+            if (Query.Arguments.Count == 0)
+			{
+				Console.WriteLine("Insufficient arguments");
+                return;
+			}
+
+            foreach (string Argument in Query.Arguments)
+			{
+                if (NodeLocator.GetRSIStatus(Argument) > RSIStatus.None)
+				{
+					Console.WriteLine("Cannot create directories remotely");
+                    return;
+				}
+
+                bool NameConflict = Player.ConnectionInfo.PathNode.GetNodeFromPath(Argument) != null;
+
+                if (NameConflict)
+				{
+					Console.WriteLine("An object with that name already exists");
+                    return;
+				}
+
+                // We're all good at this point, create the directory
+
+                if (Argument.Contains('/'))
+				{
+					Console.WriteLine("Name cannot contain slashes");
+					Console.WriteLine("To create in a directory besides the CWD, specify the [p] or [path] named parameter with the directory you wish to create in");
+					Console.WriteLine();
+					Console.WriteLine("(that last bit is not implemented yet, sorry)");
+                    return;
+				}
+
+                XmlNode NewDirectory = Player.ConnectionInfo.PathNode.OwnerDocument.CreateElement("Directory");
+
+                XmlAttribute NewDirectoryAttribute = Player.ConnectionInfo.PathNode.OwnerDocument.CreateAttribute("Name");
+                NewDirectoryAttribute.InnerText = Argument;
+
+                NewDirectory.Attributes.Append(NewDirectoryAttribute);
+
+                Player.ConnectionInfo.PathNode.AppendChild(NewDirectory);
+			}
+		}
+
         public static void SecureCopy(InputQuery Query)
 		{
             if (Query.Arguments.Count == 0)
@@ -338,7 +550,7 @@ namespace Lawful
 				{
                     case "D":
                     case "DISK":
-                        if (Player.ConnectionInfo.User.Username == "root")
+                        if (Player.ConnectionInfo.User.Username.ToUpper() == "ROOT")
                             DisplayDisksAsRoot();
                         else
                         {
