@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-using static Lawful.Program;
+using static Lawful.GameLibrary.Session;
 
 namespace Lawful
 {
@@ -14,13 +14,6 @@ namespace Lawful
 			Console.Write("] [");
 			WriteColor(Player.ConnectionInfo.PC.Address, ConsoleColor.Green);
 			Console.WriteLine(']');
-
-			Console.Write("\\ [");
-			if (Player.ConnectionInfo.User.HasSecretsDrive)
-				WriteColor(Player.ConnectionInfo.Drive.Label, Player.ConnectionInfo.Drive == Player.ConnectionInfo.User.SecretsDrive ? ConsoleColor.Red : Console.ForegroundColor);
-			else
-				Console.Write(Player.ConnectionInfo.Drive.Label);
-			Console.Write("] ");
 
 			Console.Write($"{Player.ConnectionInfo.Path} > ");
 

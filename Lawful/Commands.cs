@@ -4,9 +4,9 @@ using System.Xml;
 using System.Collections.Generic;
 
 using Lawful.InputParser;
-using Lawful.GameObjects;
+using Lawful.GameLibrary;
 
-using static Lawful.Program;
+using static Lawful.GameLibrary.Session;
 
 namespace Lawful
 {
@@ -84,10 +84,9 @@ namespace Lawful
                 Player.ConnectionInfo.PC = TryPC;
 
                 Player.ConnectionInfo.User = TryUser;
-                Player.ConnectionInfo.PathNode = Player.ConnectionInfo.PC.GetSystemDrive().Root;
-                Player.ConnectionInfo.Drive = Player.ConnectionInfo.PC.GetSystemDrive();
+                Player.ConnectionInfo.PathNode = Player.ConnectionInfo.PC.FileSystemRoot;
 
-                Events.FireSSHConnect(Player, Computers, Query);
+                Events.FireSSHConnect(Player, Computers, Query, Events);
             }
 		}
 
@@ -161,7 +160,7 @@ namespace Lawful
         private static List<Computer> ConnectedPCs = new();
         private static List<UserAccount> LoggedInAccounts = new();
 
-        public static void OtherSecureCopy(InputQuery Query)
+        public static void SecureCopy(InputQuery Query)
 		{
             if (Query.Arguments.Count == 0)
 			{
@@ -173,8 +172,8 @@ namespace Lawful
 			{
                 (bool Succeeded, dynamic Source) Arg1 = HandleOtherSCPArg(Query.Arguments[0]);
 
-                XmlNode UserDir = Player.HomePC.GetSystemDrive().GetNodeFromPath($"/home/{Player.ProfileName}");
-                XmlNode UserBin = Player.HomePC.GetSystemDrive().GetNodeFromPath("/bin");
+                XmlNode UserDir = Player.HomePC.GetNodeFromPath($"/home/{Player.ProfileName}");
+                XmlNode UserBin = Player.HomePC.GetNodeFromPath("/bin");
 
                 if (!Arg1.Succeeded) // The argument handler already prints our error messages for us so we just have to return
                     return;
@@ -370,207 +369,9 @@ namespace Lawful
 			}
 		}
 
-        public static void SecureCopy(InputQuery Query)
-		{
-            if (Query.Arguments.Count == 0)
-			{
-				Console.WriteLine("Insufficient arguments");
-                return;
-			}
-
-            XmlNode Source;
-            XmlNode Destination;
-
-            if (Query.Arguments.Count == 1)
-            {
-                string Arg1 = Query.Arguments[0];
-
-                bool Arg1Succeeded;
-
-                (Arg1Succeeded, Source) = HandleSCPArg(Arg1);
-
-                if (!Arg1Succeeded)
-                    return;
-
-                // start copy from remote machine to local machine OR from local machine to elsewhere on local machine
-
-                // If the source is an executable, copy it to bin
-                // Else, default to the cwd
-
-                if (Source.Attributes["Command"] is not null)
-                    Destination = Player.ConnectionInfo.PC.GetSystemDrive().GetNodeFromPath("/bin");
-                else
-                    Destination = Player.ConnectionInfo.PathNode;
-            }
-            else
-            {
-                string Arg1 = Query.Arguments[0];
-                string Arg2 = Query.Arguments[1];
-
-                bool Arg1Succeeded;
-                bool Arg2Succeeded;
-
-                (Arg1Succeeded, Source) = HandleSCPArg(Arg1);
-
-                if (!Arg1Succeeded)
-                    return;
-
-                (Arg2Succeeded, Destination) = HandleSCPArg(Arg2);
-
-                if (!Arg2Succeeded)
-                    return;
-            }
-            
-            Util.WriteDynamicColor($"'{Source.Attributes["Name"].Value}' ({Source.InnerText.Trim().Length}) ".PadRight(30), 10, ConsoleColor.Yellow);
-
-            Util.BeginSpinningCursorAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 32, 64, 75, Console.GetCursorPosition());
-            Util.WriteLineColor("√", ConsoleColor.Green);
-
-            XmlNode CloneOfSource = Source.Clone();
-
-            Destination.AppendChild(CloneOfSource);
-
-            ConnectedHosts.Clear();
-            LoggedInUsers.Clear();
-		}
-
-        private static (bool, XmlNode) HandleSCPArg(string Arg)
-		{
-            // Try to parse as a path on the local system first
-
-            XmlNode TryNodeLocal = LocateNode(Arg);
-
-            if (TryNodeLocal is not null)
-			{
-                return (true, TryNodeLocal);
-			}
-
-            // If not, try to parse as a [username]@[hostname]:[path] format
-
-            string[] Format = Arg.Split(':');
-
-            if (Format.Length < 2)
-			{
-				Console.WriteLine("Invalid remote path format");
-				Console.WriteLine("Expected a valid local path or [username]@[hostname]:[path]");
-                return (false, null);
-			}
-
-            string[] FormatHeader = Format[0].Split('@');
-
-            if (FormatHeader.Length < 2)
-			{
-				Console.WriteLine("Invalid remote system identifier");
-                Console.WriteLine("Expected [username]@[hostname]:[path]");
-                return (false, null);
-            }
-
-            string Username = FormatHeader[0];
-            string Path = Format[1];
-
-            // Check for hostname
-
-            if (!IPAddress.TryParse(FormatHeader[1], out IPAddress Hostname))
-			{
-				Console.WriteLine("Invalid IP address");
-                return (false, null);
-			}
-
-            if (!ConnectedHosts.Contains(Hostname))
-            {
-                Util.WriteColor($"Trying '{Hostname}'... ", ConsoleColor.Yellow);
-
-                Util.BeginSpinningCursorAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 16, 48, 75, Console.GetCursorPosition());
-
-                if (!Computers.HasComputer(Hostname.ToString()))
-                {
-                    Util.WriteLineColor($"host at '{Hostname}' did not respond", ConsoleColor.Red);
-                    return (false, null);
-                }
-
-                Util.WriteLineColor("connected!", ConsoleColor.Green);
-
-                ConnectedHosts.Add(Hostname);
-            }
-
-            // Hostname valid, check for username
-
-            Computer Host = Computers.GetComputer(Hostname.ToString());
-            
-            if (!Host.HasUser(Username))
-			{
-				Util.WriteLineColor($"Host at '{Hostname}' does not contain user '{Username}'", ConsoleColor.Red);
-                return (false, null);
-            }
-            
-            UserAccount User = Host.GetUser(Username);
-
-            if (!LoggedInUsers.Contains(Username))
-            {
-                // Both are valid, start login for that user if we're not already logged in
-
-                if (User.Password.Length > 0)
-                {
-                    string Password = String.Empty;
-
-                    do
-                    {
-                        Console.WriteLine($"Password for '{Username}': ");
-                        Password = Util.ReadLineSecret();
-
-                        if (Password == "$cancel")
-                            return (false, null);
-                    }
-                    while (Password != User.Password);
-
-                    LoggedInUsers.Add(Username);
-                }
-            }
-
-            // Now try to locate the file/directory
-
-            XmlNode TryNode = Host.GetSystemDrive().GetNodeFromPath(Path);
-
-            if (TryNode is null)
-			{
-				Console.WriteLine($"Could not find '{Path}' on remote host '{Hostname}'");
-                return (false, null);
-            }
-
-            return (true, TryNode);
-		}
-
         public static void List(InputQuery Query)
         {
             XmlNode NodeToList = Player.ConnectionInfo.PathNode;
-            
-            if (Query.Flags.Count > 0)
-			{
-				switch (Query.Flags[0].ToUpper())
-				{
-                    case "D":
-                    case "DISK":
-                        if (Player.ConnectionInfo.User.Username.ToUpper() == "ROOT")
-                            DisplayDisksAsRoot();
-                        else
-                        {
-                            DisplayDisks();
-                            if (Player.ConnectionInfo.User.HasSecretsDrive)
-                            {
-                                int DirectoryCount = Player.ConnectionInfo.User.SecretsDrive.Root.SelectNodes("Directory").Count;
-                                int FileCount = Player.ConnectionInfo.User.SecretsDrive.Root.SelectNodes("File").Count;
-
-                                Console.WriteLine();
-                                Util.WriteColor("[Current User has a Secrets Drive]", ConsoleColor.Yellow);
-                                Console.Write(" :: ");
-
-                                Console.Write($"{DirectoryCount} {(DirectoryCount == 1 ? "folder" : "folders")}, ");
-                                Console.WriteLine($"{FileCount} {(FileCount == 1 ? "file" : "files")} in root");
-                            }
-                        }
-                        return;
-				}
-			}
 
             if (Query.Arguments.Count > 0)
             {
@@ -636,51 +437,6 @@ namespace Lawful
             }
         }
 
-        private static void DisplayDisks()
-		{
-            for (int i = 0; i < Player.ConnectionInfo.PC.Drives.Count; i++)
-            {
-                PhysicalDrive Disk = Player.ConnectionInfo.PC.Drives[i];
-
-                int DirectoryCount = Disk.Root.SelectNodes("Directory").Count;
-                int FileCount = Disk.Root.SelectNodes("File").Count;
-
-                Console.Write($"Disk {i} :: ");
-                Console.Write($"{DirectoryCount} {(DirectoryCount == 1 ? "folder" : "folders")}, ");
-                Console.WriteLine($"{FileCount} {(FileCount == 1 ? "file" : "files")} in root");
-
-                Console.Write("    Type  : ");
-                Util.WriteLineColor(Disk.Type.ToString(), ConsoleColor.Yellow);
-
-                Console.Write("    Label : ");
-                Util.WriteLineColor(Disk.Label, ConsoleColor.Yellow);
-
-                if (i != Player.ConnectionInfo.PC.Drives.Count - 1)
-                    Console.WriteLine();
-            }
-        }
-
-        private static void DisplayDisksAsRoot()
-        {
-            DisplayDisks();
-
-            foreach (UserAccount Account in Player.ConnectionInfo.PC.Accounts)
-			{
-                if (Account.HasSecretsDrive)
-				{
-                    int DirectoryCount = (int)(Account.SecretsDrive.Root.SelectNodes("Directory")?.Count);
-                    int FileCount = (int)(Account.SecretsDrive.Root.SelectNodes("File")?.Count);
-
-                    Console.WriteLine();
-                    Util.WriteColor($"[User: '{Account.Username}' has a Secrets Drive]", ConsoleColor.Yellow);
-                    Console.Write(" :: ");
-
-                    Console.Write($"{DirectoryCount} {(DirectoryCount == 1 ? "folder" : "folders")}, ");
-                    Console.WriteLine($"{FileCount} {(FileCount == 1 ? "file" : "files")} in root");
-                }
-			}
-        }
-
         public static void CD(InputQuery Query)
         {
             // Handle no arguments
@@ -698,7 +454,7 @@ namespace Lawful
 			}
 
             // Handle query
-            switch (NodeLocator.LocalLocate(Query.Arguments[0], in Player.ConnectionInfo, true))
+            switch (NodeLocator.LocalLocate(Query.Arguments[0], in Player.ConnectionInfo))
 			{
                 case XmlNode n:
                     if (n.Name == "File")
@@ -794,7 +550,7 @@ namespace Lawful
 			if (Query.Length == 0) { return null; }
 
             if (Query[0] == '/')
-                return Player.ConnectionInfo.Drive.GetNodeFromPath(Query);
+                return Player.ConnectionInfo.PC.GetNodeFromPath(Query);
             else
                 return Player.ConnectionInfo.PathNode.GetNodeFromPath(Query);
 		}
@@ -864,31 +620,6 @@ namespace Lawful
             }
 		}
 
-		public static void ChangeRoot(InputQuery Query)
-        {
-            if (Query.Arguments.Count < 1) {
-				Console.WriteLine("Insufficient arguments");
-                return;
-			}
-
-            PhysicalDrive Disk;
-
-            if (Player.ConnectionInfo.User.HasSecretsDrive && Query.Arguments[0] == Player.ConnectionInfo.User.SecretsDrive.Label)
-                Disk = Player.ConnectionInfo.User.SecretsDrive;
-            else
-                Disk = Player.ConnectionInfo.PC.GetDisk(Query.Arguments[0]);
-
-            if (Disk is null)
-			{
-			    Console.WriteLine($"Could not locate a disk by the label '{Query.Arguments[0]}'");
-                return;
-			}
-
-            Player.ConnectionInfo.Drive = Disk;
-            Player.ConnectionInfo.PathNode = Disk.Root;
-
-        }
-
         public static void Concatenate(InputQuery Query)
         {
             if (Query.Arguments.Count == 0)
@@ -912,7 +643,7 @@ namespace Lawful
                         return;
                     }
                     Console.WriteLine(n.InnerText.Trim());
-                    Events.FireReadFile(Player, Computers, Query, n);
+                    Events.FireReadFile(Player, Computers, Query, Events, n);
                     break;
 
                 case XmlNodeList:

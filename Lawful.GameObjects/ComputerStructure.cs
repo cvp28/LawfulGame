@@ -5,7 +5,7 @@ using System.Xml.Serialization;
 using System.Collections.Generic;
 using System.Net;
 
-namespace Lawful.GameObjects
+namespace Lawful.GameLibrary
 {
 	public class ComputerStructure
 	{

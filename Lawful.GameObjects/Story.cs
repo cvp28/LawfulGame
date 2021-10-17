@@ -4,7 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Lawful.GameObjects
+namespace Lawful.GameLibrary
 {
 	public class Story
 	{

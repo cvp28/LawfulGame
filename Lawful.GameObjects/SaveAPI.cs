@@ -1,10 +1,9 @@
 ﻿using System;
 using System.IO;
 
-using Lawful.GameObjects;
-using static Lawful.Program;
+using static Lawful.GameLibrary.Session;
 
-namespace Lawful
+namespace Lawful.GameLibrary
 {
 	public static class SaveAPI
 	{
@@ -46,19 +45,15 @@ namespace Lawful
 				UserPC.Name = UserPCName;
 				UserAccount.Username = UserProfileName;
 
-				if (UserAccount.HasSecretsDrive)
-					UserAccount.SecretsDrive.Label = UserAccount.Username;
-
 				Computers.SerializeToFile($@"{PathToNewSaveFolder}\Computers.xml");
 
 				// Do some initialization on the User object now that we have the ComputerStructure loaded in and then serialize that to the user's save folder
-				User.HomePC = Computers.GetComputer(UserPCName);
-				User.Account = User.HomePC.GetUser(UserProfileName);
+				User.HomePC = UserPC;
+				User.Account = UserAccount;
 
 				User.ConnectionInfo.PC = User.HomePC;
 				User.ConnectionInfo.User = User.Account;
-				User.ConnectionInfo.Drive = User.HomePC.GetSystemDrive();
-				User.ConnectionInfo.PathNode = User.ConnectionInfo.Drive.Root;
+				User.ConnectionInfo.PathNode = User.ConnectionInfo.PC.FileSystemRoot;
 
 				User.SerializeToFile($@"{PathToNewSaveFolder}\User.xml");
 

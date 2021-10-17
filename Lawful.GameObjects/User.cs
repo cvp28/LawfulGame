@@ -3,7 +3,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace Lawful.GameObjects
+namespace Lawful.GameLibrary
 {
 	public class User
 	{
@@ -83,8 +83,7 @@ namespace Lawful.GameObjects
 
 			ConnectionInfo.PC = ComputerStructure.GetComputer(ConnectionReference.ReferenceAddress);
 			ConnectionInfo.User = ConnectionInfo.PC.GetUser(ConnectionReference.ReferenceUsername);
-			ConnectionInfo.Drive = ConnectionInfo.PC.GetDisk(ConnectionReference.ReferenceLabel);
-			ConnectionInfo.PathNode = ConnectionInfo.Drive.GetNodeFromPath(ConnectionReference.ReferencePath);
+			ConnectionInfo.PathNode = ConnectionInfo.PC.GetNodeFromPath(ConnectionReference.ReferencePath);
 		}
 	}
 }

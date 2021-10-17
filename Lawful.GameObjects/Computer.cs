@@ -4,7 +4,7 @@ using System.Xml.Serialization;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Lawful.GameObjects
+namespace Lawful.GameLibrary
 {
 	public class Computer
 	{
@@ -20,8 +20,8 @@ namespace Lawful.GameObjects
 		[XmlElement("Account")]
 		public List<UserAccount> Accounts;
 
-		[XmlElement("Drive")]
-		public List<PhysicalDrive> Drives;
+		[XmlElement("Root")]
+		public XmlNode FileSystemRoot;
 
 		public Computer() { }
 
@@ -34,8 +34,6 @@ namespace Lawful.GameObjects
 
 			Accounts = new();
 			Accounts.Add(new UserAccount("root", String.Empty));
-
-			Drives = new();
 		}
 
 		public Computer(string Name, string Address, string RootPassword)
@@ -47,34 +45,6 @@ namespace Lawful.GameObjects
 
 			Accounts = new();
 			Accounts.Add(new("root", RootPassword));
-
-			Drives = new();
-		}
-
-		public PhysicalDrive GetSystemDrive() => Drives.FirstOrDefault(disk => disk.Type == PhysicalDriveType.System);
-
-		public PhysicalDrive GetDisk(string Label) => Drives.FirstOrDefault(disk => disk.Label == Label);
-
-		public bool HasDisk(string Label) => Drives.Any(disk => disk.Label == Label);
-
-		public bool AddDisk(PhysicalDrive Disk)
-		{
-			if (Drives.Any(disk => disk.Label == Disk.Label)) { return false; }
-			if (Drives.Any(disk => disk.Type == PhysicalDriveType.System) && Disk.Type == PhysicalDriveType.System) { return false; }
-
-			Drives.Add(Disk);
-			return true;
-		}
-
-		public bool RemoveDisk(string Label)
-		{
-			PhysicalDrive Disk = Drives.FirstOrDefault(disk => disk.Label == Label);
-
-			if (Disk is null) { return false; }
-
-			Drives.Remove(Disk);
-
-			return true;
 		}
 
 		public UserAccount GetRootUser() => Accounts.FirstOrDefault(account => account.Username == "Root");

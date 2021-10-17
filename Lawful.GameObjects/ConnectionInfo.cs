@@ -1,6 +1,6 @@
 ﻿using System.Xml;
 
-namespace Lawful.GameObjects
+namespace Lawful.GameLibrary
 {
     public class ConnectionInfo
     {
@@ -9,8 +9,6 @@ namespace Lawful.GameObjects
         public Computer PC;
 
         public XmlNode PathNode;
-
-        public PhysicalDrive Drive;
 
         public UserAccount User;
     }

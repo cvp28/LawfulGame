@@ -2,11 +2,10 @@
 using System.IO;
 using System.Reflection;
 
-using Lawful.GameObjects;
+using static Lawful.GameLibrary.Session;
+using static Lawful.GameLibrary.Constants;
 
-using static Lawful.Program;
-
-namespace Lawful
+namespace Lawful.GameLibrary
 {
 	public static class MissionAPI
 	{

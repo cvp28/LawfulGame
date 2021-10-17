@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace Lawful.GameObjects
+namespace Lawful.GameLibrary
 {
 	public class UserAccount
 	{
@@ -9,15 +9,6 @@ namespace Lawful.GameObjects
 
 		[XmlAttribute("Password")]
 		public string Password;
-
-		[XmlElement("SecretsDrive")]
-		public PhysicalDrive SecretsDrive { get; set; }
-
-		[XmlAttribute("HasSecretsDrive")]
-		public bool HasSecretsDrive
-		{
-			get { return SecretsDrive is not null; }
-		}
 
 		public UserAccount() { }
 

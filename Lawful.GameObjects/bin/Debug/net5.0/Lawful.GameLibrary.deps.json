@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v5.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v5.0": {
+      "Lawful.GameLibrary/1.0.0": {
+        "dependencies": {
+          "Lawful.InputParser": "1.0.0"
+        },
+        "runtime": {
+          "Lawful.GameLibrary.dll": {}
+        }
+      },
+      "Lawful.InputParser/1.0.0": {
+        "runtime": {
+          "Lawful.InputParser.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Lawful.GameLibrary/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Lawful.InputParser/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

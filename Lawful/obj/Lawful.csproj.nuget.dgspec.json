@@ -4,12 +4,12 @@
     "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful\\Lawful.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameObjects\\Lawful.GameObjects.csproj": {
+    "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameObjects\\Lawful.GameLibrary.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameObjects\\Lawful.GameObjects.csproj",
-        "projectName": "Lawful.GameObjects",
-        "projectPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameObjects\\Lawful.GameObjects.csproj",
+        "projectUniqueName": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameObjects\\Lawful.GameLibrary.csproj",
+        "projectName": "Lawful.GameLibrary",
+        "projectPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameObjects\\Lawful.GameLibrary.csproj",
         "packagesPath": "C:\\Users\\Carson\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameObjects\\obj\\",
         "projectStyle": "PackageReference",
@@ -140,8 +140,8 @@
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameObjects\\Lawful.GameObjects.csproj": {
-                "projectPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameObjects\\Lawful.GameObjects.csproj"
+              "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameObjects\\Lawful.GameLibrary.csproj": {
+                "projectPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameObjects\\Lawful.GameLibrary.csproj"
               },
               "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.InputParser\\Lawful.InputParser.csproj": {
                 "projectPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.InputParser\\Lawful.InputParser.csproj"

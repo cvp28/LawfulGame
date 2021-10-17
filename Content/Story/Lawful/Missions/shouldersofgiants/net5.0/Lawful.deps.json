@@ -8,19 +8,19 @@
     ".NETCoreApp,Version=v5.0": {
       "Lawful/1.0.0": {
         "dependencies": {
-          "Lawful.GameObjects": "1.0.0",
+          "Lawful.GameLibrary": "1.0.0",
           "Lawful.InputParser": "1.0.0"
         },
         "runtime": {
           "Lawful.dll": {}
         }
       },
-      "Lawful.GameObjects/1.0.0": {
+      "Lawful.GameLibrary/1.0.0": {
         "dependencies": {
           "Lawful.InputParser": "1.0.0"
         },
         "runtime": {
-          "Lawful.GameObjects.dll": {}
+          "Lawful.GameLibrary.dll": {}
         }
       },
       "Lawful.InputParser/1.0.0": {
@@ -36,7 +36,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Lawful.GameObjects/1.0.0": {
+    "Lawful.GameLibrary/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

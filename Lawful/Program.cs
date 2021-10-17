@@ -2,11 +2,11 @@
 using System.IO;
 using System.Xml;
 using System.Threading;
-using System.Reflection;
-using System.Runtime.Loader;
 
 using Lawful.InputParser;
-using Lawful.GameObjects;
+using Lawful.GameLibrary;
+
+using static Lawful.GameLibrary.Session;
 
 namespace Lawful
 {
@@ -24,22 +24,6 @@ namespace Lawful
 	{
         public static bool Active = true;
         public static GameState CurrentState = GameState.MainMenu;
-
-        public static User Player;
-        public static EventManager Events;
-        public static ComputerStructure Computers;
-
-        public static Assembly CurrentMissionAssembly;
-        public static AssemblyLoadContext MissionAssemblyLoader;
-
-        public static Story CurrentStory;
-        public static StoryMission CurrentMission;
-
-        // other objects will go here once I build a way to serialize them
-
-        internal const string MissionAssemblyNamespace = "Lawful.Mission";
-        internal const string MissionAssemblyEntryClassName = "Entry";
-        internal const string MissionAssemblyDataClassName = "Data";
 
         static void Main()
         {
@@ -179,7 +163,7 @@ namespace Lawful
 
                 while (CurrentState == GameState.LoadingAnimation)
 				{
-                    Events.FireBootupSequenceStarted(Player, Computers);
+                    Events.FireBootupSequenceStarted(Player, Computers, Events);
 
                     Console.CursorVisible = false;
                     Console.Clear();
@@ -319,7 +303,7 @@ namespace Lawful
 
                     Console.CursorVisible = true;
 
-                    Events.FireBootupSequenceCompleted(Player, Computers);
+                    Events.FireBootupSequenceCompleted(Player, Computers, Events);
 
                     CurrentState = GameState.Console;
                 }
@@ -334,14 +318,14 @@ namespace Lawful
 
                     Console.WriteLine();
 
-                    Events.FireCommandEntered(Player, Computers, UserQuery);
+                    Events.FireCommandEntered(Player, Computers, UserQuery, Events);
 
                     if (!MissionAPI.GetMissionData<bool>("OverrideCommand"))
                         HandleQuery(UserQuery);
                     else
                         MissionAPI.SetMissionData("OverrideCommand", false);
 
-                    Events.FireCommandExecuted(Player, Computers, UserQuery);
+                    Events.FireCommandExecuted(Player, Computers, UserQuery, Events);
 
                     Console.WriteLine();
 
@@ -382,10 +366,6 @@ namespace Lawful
                         Console.WriteLine(NodeLocator.GetRSIStatus(Query.Arguments[0]));
                     return;
 
-                case "OSCP":
-                    Commands.OtherSecureCopy(Query);
-                    return;
-
                 case "MKDIR":
                 case "MD":
                     Commands.MakeDirectory(Query);
@@ -397,7 +377,7 @@ namespace Lawful
                     return;
             }
 
-            XmlNode TryExecuteBin = Player.ConnectionInfo.PC.GetSystemDrive().GetNodeFromPath($"bin/{Query.Command}");
+            XmlNode TryExecuteBin = Player.ConnectionInfo.PC.GetNodeFromPath($"bin/{Query.Command}");
             XmlNode TryExecuteLocal = NodeLocator.LocalLocate(Query.Command, in Player.ConnectionInfo);
             XmlNode TryExecute;
 
@@ -483,11 +463,6 @@ namespace Lawful
                     //  });
                     break;
 
-                case "CHANGEROOT":
-                case "CR":
-                    Commands.ChangeRoot(Query);
-                    break;
-
                 //  case "LOGIN":
                 //      Commands.Login(Query);
                 //      break;
@@ -501,8 +476,7 @@ namespace Lawful
                     }
                     Player.ConnectionInfo.PC = Player.HomePC;
                     Player.ConnectionInfo.User = Player.HomePC.GetUser(Player.ProfileName);
-                    Player.ConnectionInfo.Drive = Player.HomePC.GetSystemDrive();
-                    Player.ConnectionInfo.PathNode = Player.HomePC.GetSystemDrive().Root;
+                    Player.ConnectionInfo.PathNode = Player.HomePC.FileSystemRoot;
                     Console.WriteLine("Disconnected");
                     break;
 

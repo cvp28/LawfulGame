@@ -32,9 +32,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameObjects\\Lawful.GameObjects.csproj",
-      "projectName": "Lawful.GameObjects",
-      "projectPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameObjects\\Lawful.GameObjects.csproj",
+      "projectUniqueName": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameObjects\\Lawful.GameLibrary.csproj",
+      "projectName": "Lawful.GameLibrary",
+      "projectPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameObjects\\Lawful.GameLibrary.csproj",
       "packagesPath": "C:\\Users\\Carson\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameObjects\\obj\\",
       "projectStyle": "PackageReference",

@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace Lawful.GameObjects
+namespace Lawful.GameLibrary
 {
 	public struct ConnectionInfoReference
 	{
@@ -9,9 +9,6 @@ namespace Lawful.GameObjects
 
 		[XmlIgnore]
 		internal string ReferenceAddress;
-
-		[XmlIgnore]
-		internal string ReferenceLabel;
 
 		[XmlIgnore]
 		internal string ReferencePath;
@@ -28,14 +25,6 @@ namespace Lawful.GameObjects
 		{
 			get { return PlayerReference.ConnectionInfo.PC.Address; }
 			set { ReferenceAddress = value; }
-		}
-
-
-		[XmlAttribute("DriveLabel")]
-		public string StoredDriveLabel
-		{
-			get { return PlayerReference.ConnectionInfo.Drive.Label; }
-			set { ReferenceLabel = value; }
 		}
 
 

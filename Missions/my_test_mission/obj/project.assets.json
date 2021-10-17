@@ -1,0 +1,97 @@
+{
+  "version": 3,
+  "targets": {
+    "net5.0": {}
+  },
+  "libraries": {},
+  "projectFileDependencyGroups": {
+    "net5.0": [
+      "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Missions\\Lawful.GameObjects\\Lawful.GameObjects.csproj",
+      "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Missions\\Lawful\\Lawful.csproj"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\Carson\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Missions\\my_test_mission\\my_test_mission.csproj",
+      "projectName": "my_test_mission",
+      "projectPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Missions\\my_test_mission\\my_test_mission.csproj",
+      "packagesPath": "C:\\Users\\Carson\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Missions\\my_test_mission\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\Carson\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net5.0"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net5.0": {
+          "targetAlias": "net5.0",
+          "projectReferences": {
+            "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Missions\\Lawful.GameObjects\\Lawful.GameObjects.csproj": {
+              "projectPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Missions\\Lawful.GameObjects\\Lawful.GameObjects.csproj"
+            },
+            "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Missions\\Lawful\\Lawful.csproj": {
+              "projectPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Missions\\Lawful\\Lawful.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "net5.0": {
+        "targetAlias": "net5.0",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.400\\RuntimeIdentifierGraph.json"
+      }
+    }
+  },
+  "logs": [
+    {
+      "code": "NU1104",
+      "level": "Error",
+      "message": "Unable to find project 'C:\\Users\\Carson\\source\\repos\\LawfulGame\\Missions\\Lawful.GameObjects\\Lawful.GameObjects.csproj'. Check that the project reference is valid and that the project file exists.",
+      "libraryId": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Missions\\Lawful.GameObjects\\Lawful.GameObjects.csproj",
+      "targetGraphs": [
+        "net5.0"
+      ]
+    },
+    {
+      "code": "NU1104",
+      "level": "Error",
+      "message": "Unable to find project 'C:\\Users\\Carson\\source\\repos\\LawfulGame\\Missions\\Lawful\\Lawful.csproj'. Check that the project reference is valid and that the project file exists.",
+      "libraryId": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Missions\\Lawful\\Lawful.csproj",
+      "targetGraphs": [
+        "net5.0"
+      ]
+    }
+  ]
+}

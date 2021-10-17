@@ -15,12 +15,12 @@ C:\Users\Carson\source\repos\LawfulGame\Lawful\bin\Debug\net5.0\Lawful.runtimeco
 C:\Users\Carson\source\repos\LawfulGame\Lawful\bin\Debug\net5.0\Lawful.dll
 C:\Users\Carson\source\repos\LawfulGame\Lawful\bin\Debug\net5.0\ref\Lawful.dll
 C:\Users\Carson\source\repos\LawfulGame\Lawful\bin\Debug\net5.0\Lawful.pdb
-C:\Users\Carson\source\repos\LawfulGame\Lawful\bin\Debug\net5.0\Lawful.GameObjects.dll
 C:\Users\Carson\source\repos\LawfulGame\Lawful\bin\Debug\net5.0\Lawful.InputParser.dll
-C:\Users\Carson\source\repos\LawfulGame\Lawful\bin\Debug\net5.0\Lawful.GameObjects.pdb
 C:\Users\Carson\source\repos\LawfulGame\Lawful\bin\Debug\net5.0\Lawful.InputParser.pdb
 C:\Users\Carson\source\repos\LawfulGame\Lawful\obj\Debug\net5.0\Lawful.csproj.CopyComplete
 C:\Users\Carson\source\repos\LawfulGame\Lawful\obj\Debug\net5.0\Lawful.dll
 C:\Users\Carson\source\repos\LawfulGame\Lawful\obj\Debug\net5.0\ref\Lawful.dll
 C:\Users\Carson\source\repos\LawfulGame\Lawful\obj\Debug\net5.0\Lawful.pdb
 C:\Users\Carson\source\repos\LawfulGame\Lawful\obj\Debug\net5.0\Lawful.genruntimeconfig.cache
+C:\Users\Carson\source\repos\LawfulGame\Lawful\bin\Debug\net5.0\Lawful.GameLibrary.dll
+C:\Users\Carson\source\repos\LawfulGame\Lawful\bin\Debug\net5.0\Lawful.GameLibrary.pdb

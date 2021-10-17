@@ -2,10 +2,9 @@
 using System.Net;
 using System.Xml;
 
-using Lawful.GameObjects;
-using static Lawful.Program;
+using static Lawful.GameLibrary.Session;
 
-namespace Lawful
+namespace Lawful.GameLibrary
 {
 	public enum RSIStatus
 	{
@@ -19,6 +18,68 @@ namespace Lawful
 
 	public static class NodeLocator
 	{
+		//	public static bool TryGetRSI(string Query, out string RSI, out string Path, out RSIStatus Status)
+		//	{
+		//		if (!Query.Contains(':') || !Query.Contains('@'))
+		//		{
+		//			RSI = string.Empty;
+		//			Path = Query;
+		//			Status = RSIStatus.None;
+		//		}
+		//	
+		//		string[] QueryElements = Query.Split(':', StringSplitOptions.RemoveEmptyEntries);
+		//		string[] RSIElements = QueryElements[0].Split('@', StringSplitOptions.RemoveEmptyEntries);
+		//	
+		//		if (RSIElements.Length != 2)
+		//		{
+		//			RSI = string.Empty;
+		//			Path = Query;
+		//			Status = RSIStatus.None;
+		//		}
+		//	
+		//		string Username = RSIElements[0];
+		//		string Hostname = RSIElements[1];
+		//	
+		//		bool ValidIP = IPAddress.TryParse(Hostname, out _);
+		//		bool Resolves = Computers.HasComputer(Hostname);
+		//	
+		//		if (!ValidIP)
+		//		{
+		//			RSI = string.Empty;
+		//			Path = Query;
+		//			Status = RSIStatus.InvalidIP;
+		//		}
+		//	
+		//		if (!Resolves)
+		//		{
+		//			RSI = $"{Username}@{Hostname}";
+		//			Path = Query;
+		//			Status = RSIStatus.NonResolving;
+		//		}
+		//	
+		//		if (Player.ConnectionInfo.PC.Address == Hostname)
+		//		{
+		//			RSI = $"{Username}@{Hostname}";
+		//			Path = Query;
+		//			Status = RSIStatus.Redundant;
+		//		}
+		//	
+		//		// At this point, we have determined that the remote system identifier is the correct length and actually represents a valid and non-redundant host
+		//		// Now check user
+		//	
+		//		bool ValidUser = Computers.GetComputer(Hostname).HasUser(Username);
+		//	
+		//		if (!ValidUser)
+		//		{
+		//	
+		//			Status = RSIStatus.Resolves;
+		//		}
+		//	
+		//	
+		//	
+		//		return false;
+		//	}
+
 		public static RSIStatus GetRSIStatus(string Query)
 		{
 			if (!Query.Contains(':') || !Query.Contains('@'))
@@ -95,39 +156,18 @@ namespace Lawful
 		// LocalLocate will parse the input query as being either of a [disklabel]:[path] format or a [path] format
 		// RemoteLocate will expect an RSI at the start of the query and therefore is desgined to parse a [username]@[hostname]:[disklabel]:[path] format or a [username]@[hostname]:[path] format with the disk being implied
 
-		public static dynamic LocalLocate(string Query, in ConnectionInfo ConnectionInfo, bool NoDiskChange = false)
+		public static dynamic LocalLocate(string Query, in ConnectionInfo ConnectionInfo)
 		{
 			bool StartAtRoot;
-			bool EvaluateDisk = Query.Contains(':') && !NoDiskChange;
 			string Path;
 
 			XmlNode Traverser;
-			PhysicalDrive TryDisk;
 
-			if (EvaluateDisk)
-			{
-				string[] QueryElements = Query.Split(':');
-
-				if (ConnectionInfo.User.HasSecretsDrive && QueryElements[0] == ConnectionInfo.User.SecretsDrive.Label)
-					TryDisk = ConnectionInfo.User.SecretsDrive;
-				else
-					TryDisk = ConnectionInfo.PC.GetDisk(QueryElements[0]);
-
-				if (TryDisk is null)
-					return null;
-
-				Path = QueryElements[1];
-				StartAtRoot = true;
-			}
-			else
-			{
-				TryDisk = ConnectionInfo.Drive;
-				Path = Query;
-				StartAtRoot = Path[0] == '/';
-			}
+			Path = Query;
+			StartAtRoot = Path[0] == '/';
 
 			if (StartAtRoot)
-				Traverser = TryDisk.Root;
+				Traverser = ConnectionInfo.PC.FileSystemRoot;
 			else
 				Traverser = ConnectionInfo.PathNode;
 
@@ -146,28 +186,9 @@ namespace Lawful
 		{
 			string[] QueryElements = Query.Split(':', StringSplitOptions.RemoveEmptyEntries);
 			string Path;
+			Path = QueryElements[1];
 
-			bool EvaluateDisk = QueryElements.Length >= 3;
-
-			if (EvaluateDisk)
-			{
-				if (ConnectionInfo.User.HasSecretsDrive && QueryElements[1] == ConnectionInfo.User.SecretsDrive.Label)
-					ConnectionInfo.Drive = ConnectionInfo.User.SecretsDrive;
-				else
-					ConnectionInfo.Drive = ConnectionInfo.PC.GetDisk(QueryElements[1]);
-
-				if (ConnectionInfo.Drive is null)
-					return null;
-
-				Path = QueryElements[2];
-			}
-			else
-			{
-				ConnectionInfo.Drive = ConnectionInfo.PC.GetSystemDrive();
-				Path = QueryElements[1];
-			}
-
-			return LocateNode(Path, ConnectionInfo.Drive.Root);
+			return LocateNode(Path, ConnectionInfo.PC.FileSystemRoot);
 		}
 
 		public static dynamic LocateNode(string Path, XmlNode Traverser)
