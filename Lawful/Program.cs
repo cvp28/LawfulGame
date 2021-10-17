@@ -495,7 +495,7 @@ namespace Lawful
             if (Verbose)
 			{
 				Console.WriteLine("The Lawful Game Project");
-				Console.WriteLine("August 2021 :: Carson Ver Planck");
+				Console.WriteLine("October 2021 :: Carson Ver Planck");
 				Console.WriteLine();
 			}
 

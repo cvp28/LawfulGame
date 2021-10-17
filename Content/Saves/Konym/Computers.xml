@@ -1,0 +1,177 @@
+<?xml version="1.0"?>
+<ComputerStructure xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Computer Name="Apollo-PC" Address="117.92.201.6">
+    <ScanResult Name="bedroom_link" Address="172.116.23.251" />
+    <Account Username="root" Password="" />
+    <Account Username="Konym" Password="" />
+    <Root>
+      <Root>
+        <Directory Name="home">
+          <File Name="test.txt">
+			This is a test document
+		</File>
+          <Directory Name="Konym">
+            <Directory Name="Documents">
+              <Directory Name="not porn">
+                <Directory Name="School">
+                  <File Name="UsHist Chapter 11 &amp; 12 Outline.docx">
+1. Samuel Slater
+Went to U.S. and founded Slater's Mills
+2. Eli Whitney
+Developed interchangeable parts for weaponry
+3. Factory employment
+Often consisting of immigrants or poor individuals
+4. Industrial Revolution
+Birthed factories
+5. Importance of Cotton to the South
+Cotton Gin // Booming economy
+6. Planter
+Often owned slaves and/or a plantation
+7. Yeoman farmer
+Often did not own slaves / owned very little but worked alongside them
+8. What did the Southern economy depend on?
+Cotton
+9. Cotton gin
+A machine used to mass producing cotton
+10. Importance of slaves to the Southern economy
+Picking cotton
+11. African American slave culture
+Very strict
+12. Nat Turner
+Slave Rebellion
+						</File>
+                </Directory>
+              </Directory>
+              <File Name="US National Anthem Vocoded to Gangsta's Paradise.mp3" />
+              <File Name="hiresdefault.png" />
+              <File Name="netScan" Command="scan" />
+              <File Name="todo.txt">
+1. email teacher about attendance
+2. apply to del taco
+3. ask out that girl in 5th period
+4. make more to-do lists
+5.
+				</File>
+            </Directory>
+          </Directory>
+        </Directory>
+        <Directory Name="sys">
+          <File Name="kguilib.sys" />
+          <File Name="netman.sys" />
+          <File Name="kcmk.sys" />
+          <File Name="sfs.sys" />
+        </Directory>
+        <Directory Name="bin">
+          <File Name="ssh" Command="ssh" />
+          <File Name="su" Command="su" />
+          <File Name="ls" Command="ls" />
+          <File Name="cd" Command="cd" />
+          <File Name="mv" Command="mv" />
+          <File Name="rm" Command="rm" />
+          <File Name="cr" Command="cr" />
+          <File Name="cat" Command="cat" />
+          <File Name="sus" Command="sus" />
+          <File Name="clear" Command="clear" />
+          <File Name="dc" Command="dc" />
+          <File Name="pwd" Command="pwd" />
+          <File Name="scp" Command="scp" />
+        </Directory>
+        <Directory Name="www-root">
+          <File Name="index.html" />
+          <Directory Name="content">
+            <File Name="content.css" />
+          </Directory>
+          <File Name="jermasus.txt">
+.   ....../#########((#(*,. ,...,,,,,......,..........,**((((/#(/////////////////
+........../(######(/*,,.,......,.......................,,***/(#(#(///////////////
+,(###(//,,,,...,*.............,,....,,,.....,,.,*///((((///////////////
+*,,,,,,..  . .,*,...,,,,*,*****///(///////*****,,,*,,,*///////////////
+.,,,....   ...,,,,,,,*////((((####%%%%%%######(((/*,,,....,**//////////
+.....  ...,,,.... ...,,,****,,/((((((####%%%%%%%%%%%%%####((((**,,...,/*/////////
+.....,*,,,,..   .,,*******/,*(((((########%%%%%&amp;%%%##########(/**,......////////
+,.***/,,*,,..   ,,****/*****,/((((((#####%%%%%&amp;&amp;&amp;&amp;%%%##########(/*,,.....,///////
+*,****//...   .,**///*****,*((((((((#######%%%%%%%%%##########(((/*,,.....,//////
+%%%%#(/*,..  ,,************((((############%%%%%&amp;&amp;%%%%%########((/**,....,*///(//
+%%%%%%,,,....,**********/(((((((((##(#######%#%%%%%%%%%########(((**,.....*/////(
+%%%%%%.,. ...*******//(((((((((((((((((##########%&amp;&amp;%%%#########((*,,.....*(/((/(
+%%%%%%*.. ...********/(((((((((((((((((((##((#(#################((/*,.....//(((((
+%%%%%%%*....,****,,,,,,,,**///////((((((((((((///*,,,,*,*,***//(##(/,,....(((((((
+%%%%%%%#,..,*,.,,*//**,.,,,,,*****/////((////***,,.,,..,********/(((*,..  (((((((
+%%%%%%%&amp;. .,,,**/*,.  ..,....,,,*,***(((((/*/**,...***/#/....,*/(&amp;%#(....,(((((((
+%%%%%%%&amp;,. ,,***,..,,**,   .*,..,,**/(#%%#(/*,,,,,*,.,,,*/***,/((//##,.///((((/((
+%%%%%%#%*,.*//****,,,,*... .....,,,((((#%%(/.,..,,,,*,*/(#(/(##%%%###,,/(/(/(((((
+%%%%%%%#*..*/***,,,,,****,,,,,,,,,,/(###%##(((/**,,*,,,**/(#(#((*/(((*,//((((((((
+%%%%%%%%*..********,,,,,,,,*//**,,,*(##%%#((((((((((/////((######*/((*.*/(#((((((
+%%%%%%%#,..*****///((((((((///******/(###((((((((((((////(((((#####/*///###(((/((
+%%%%%%%#...,***///(((((((//********//(#%#(((/((((/////(((##(((((###((*##%%#(((/((
+%%%%%%%**,.****////////*****,*****//((((#((((((((((((**,,**///////(/((###%%((((((
+%%%%%%%%(,.******/**,,,,**,*******//(((((#(((((((((((///*,,,,**/##*(/(((((//(((((
+%%%%%%%%%#.*******.,,,,,,****,*****/(#(((//**///(((((////*,,,,.,/(/*/(((///(/((((
+%%%%%%%%%%%(*****.,,..,,,*****,,,,,,,******////(((//***,,...,, ,*/*//(((//(//((((
+%%%%%%%%%%%%/***/,/***. ...*****,,,,,,,,*((///****,,,**...,*,,.///*/*/*///////(((
+%%%%%%%%%%%(%****/*/****.. ,*****,************((#%(####.,(///,/*(,/*/////////*(((
+%%%%%%##%%#,#(****/*(/***,.(%#%#%&amp;/(##(/(&amp;@##&amp;@#&amp;&amp;%&amp;&amp;*,/(////,//*//(((////////(((
+###%%%##%##.#%%/***/**/**,,. #%%&amp;&amp;%&amp;&amp;&amp;&amp;(&amp;&amp;@@&amp;&amp;&amp;&amp;&amp;&amp;%..*/((((//(/**/(((///*/////((/
+###########*/%%%%/**//*/***,,...,/*%%%%%%&amp;&amp;%%,//,/#***/((((/((//(/////*/*.
+###########(,%%###(*,*/*/**,,,,../*.,,,,,,,,,,#(&amp;%//*/(##((((*/*/////*/**.    ...
+###########%,######((**/******,,*/*,/((#(###((((////(((##((/***/*//**//*,.     ..
+############((#(,,**,,,,//****//*,,**/////(//(////((((####(/(((%*#%%(((*..      .
+########(/*,**///***./,,,*********/////(((((((((((((((###(///((((.*((#%%%* . ....
+((*,,**,****,**///, ***,,,,*****/*///////(/((/(((((#(#(#(*///((((/.#####((##%%%%(
+/*,*,,,,***,**///* ****,,,,,***/**/////(((/((((###((#(#*,,**/((((/,######%%%%#((#
+**,,,,***,***********,,,*,,,,,,//////(/((((((((#((#((,*//((*,,(((**##############
+*,,,,****/****/*/*.,,,,,**,**,,,/*///(((((((((((((((,*////((/,,,((###############
+**,,****//*,,,****. *,,,,*****,,,,**///(/(///////,,**/////((((((*#(((############
+		</File>
+        </Directory>
+      </Root>
+    </Root>
+  </Computer>
+  <Computer Name="bedroom_link" Address="172.116.23.251">
+    <Account Username="root" Password="" />
+    <Account Username="jason" Password="cookies" />
+    <Root>
+      <Root>
+        <Directory Name="home">
+          <File Name="test.txt">
+This is a test document
+		</File>
+          <Directory Name="jason">
+            <Directory Name="Documents">
+              <File Name="reminder.txt">
+1. Apply for a job
+2. Study for US History test
+3. Investigate hacker forum
+4. ???
+5.
+6.
+7. Profit
+				</File>
+            </Directory>
+          </Directory>
+        </Directory>
+        <Directory Name="sys">
+          <File Name="kguilib.sys" />
+          <File Name="netman.sys" />
+          <File Name="kcmk.sys" />
+          <File Name="sfs.sys" />
+        </Directory>
+        <Directory Name="bin">
+          <File Name="ssh" Command="ssh" />
+          <File Name="su" Command="su" />
+          <File Name="ls" Command="ls" />
+          <File Name="cd" Command="cd" />
+          <File Name="mv" Command="mv" />
+          <File Name="rm" Command="rm" />
+          <File Name="cr" Command="cr" />
+          <File Name="cat" Command="cat" />
+          <File Name="sus" Command="sus" />
+          <File Name="clear" Command="clear" />
+          <File Name="dc" Command="dc" />
+          <File Name="pwd" Command="pwd" />
+          <File Name="scp" Command="scp" />
+        </Directory>
+      </Root>
+    </Root>
+  </Computer>
+</ComputerStructure>

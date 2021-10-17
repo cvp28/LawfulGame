@@ -145,17 +145,12 @@ namespace Lawful
 
                 foreach (ScanResult Result in Player.ConnectionInfo.PC.ScanResults)
                     Util.WriteLineColor($"    {Result.Name}@{Result.Address}", ConsoleColor.Yellow);
-
-                
             }
             else
             {
 				Console.WriteLine("Scan did not find any PCs open to the internet");
 			}
         }
-
-        private static List<IPAddress> ConnectedHosts = new();
-        private static List<string> LoggedInUsers = new();
 
         private static List<Computer> ConnectedPCs = new();
         private static List<UserAccount> LoggedInAccounts = new();
@@ -176,7 +171,11 @@ namespace Lawful
                 XmlNode UserBin = Player.HomePC.GetNodeFromPath("/bin");
 
                 if (!Arg1.Succeeded) // The argument handler already prints our error messages for us so we just have to return
+                {
+                    ConnectedPCs.Clear();
+                    LoggedInAccounts.Clear();
                     return;
+                }
 
                 switch (Arg1.Source)
 				{
@@ -204,7 +203,11 @@ namespace Lawful
                 (bool Succeeded, dynamic Source) Arg2 = HandleOtherSCPArg(Query.Arguments[1]);
 
                 if (!Arg1.Succeeded || !Arg2.Succeeded)
+                {
+                    ConnectedPCs.Clear();
+                    LoggedInAccounts.Clear();
                     return;
+                }
 
                 // Sort out the destination
                 switch (Arg2.Source)
@@ -216,7 +219,9 @@ namespace Lawful
 
                     default:
 						Console.WriteLine("Invalid destination, must be a folder");
-                        break;
+                        ConnectedPCs.Clear();
+                        LoggedInAccounts.Clear();
+                        return;
 				}
 
                 // Sort out the source
