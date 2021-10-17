@@ -2,20 +2,6 @@
   "version": 3,
   "targets": {
     "net5.0": {
-      "Lawful/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v5.0",
-        "dependencies": {
-          "Lawful.GameLibrary": "1.0.0",
-          "Lawful.InputParser": "1.0.0"
-        },
-        "compile": {
-          "bin/placeholder/Lawful.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Lawful.dll": {}
-        }
-      },
       "Lawful.GameLibrary/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
@@ -42,11 +28,6 @@
     }
   },
   "libraries": {
-    "Lawful/1.0.0": {
-      "type": "project",
-      "path": "../../Lawful/Lawful.csproj",
-      "msbuildProject": "../../Lawful/Lawful.csproj"
-    },
     "Lawful.GameLibrary/1.0.0": {
       "type": "project",
       "path": "../../Lawful.GameLibrary/Lawful.GameLibrary.csproj",
@@ -60,7 +41,7 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "Lawful >= 1.0.0"
+      "Lawful.GameLibrary >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -90,8 +71,8 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
-            "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful\\Lawful.csproj": {
-              "projectPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful\\Lawful.csproj"
+            "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameLibrary\\Lawful.GameLibrary.csproj": {
+              "projectPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameLibrary\\Lawful.GameLibrary.csproj"
             }
           }
         }

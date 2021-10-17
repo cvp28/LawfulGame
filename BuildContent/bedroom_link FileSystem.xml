@@ -3,7 +3,7 @@
 		<File Name="test.txt">
 This is a test document
 		</File>
-		<Directory Name="Konym">
+		<Directory Name="jason">
 			<Directory Name="Documents">
 				<File Name="reminder.txt">
 1. Apply for a job
@@ -26,7 +26,6 @@ This is a test document
 	<Directory Name="bin">
 		<File Name="ssh" Command="ssh"/>
 		<File Name="su" Command="su"/>
-		<File Name="scan" Command="scan"/>
 		<File Name="ls" Command="ls"/>
 		<File Name="cd" Command="cd"/>
 		<File Name="mv" Command="mv"/>

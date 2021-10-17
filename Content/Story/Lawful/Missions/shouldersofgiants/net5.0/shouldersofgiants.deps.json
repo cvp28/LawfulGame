@@ -8,19 +8,10 @@
     ".NETCoreApp,Version=v5.0": {
       "shouldersofgiants/1.0.0": {
         "dependencies": {
-          "Lawful": "1.0.0"
+          "Lawful.GameLibrary": "1.0.0"
         },
         "runtime": {
           "shouldersofgiants.dll": {}
-        }
-      },
-      "Lawful/1.0.0": {
-        "dependencies": {
-          "Lawful.GameLibrary": "1.0.0",
-          "Lawful.InputParser": "1.0.0"
-        },
-        "runtime": {
-          "Lawful.dll": {}
         }
       },
       "Lawful.GameLibrary/1.0.0": {
@@ -40,11 +31,6 @@
   },
   "libraries": {
     "shouldersofgiants/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Lawful/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

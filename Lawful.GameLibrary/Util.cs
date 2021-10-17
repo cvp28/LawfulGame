@@ -15,7 +15,7 @@ namespace Lawful
 			WriteColor(Player.ConnectionInfo.PC.Address, ConsoleColor.Green);
 			Console.WriteLine(']');
 
-			Console.Write($"{Player.ConnectionInfo.Path} > ");
+			Console.Write($"\\ {Player.ConnectionInfo.Path} > ");
 
 			//	Console.Write($"\\ [{Player.ConnectionInfo.Drive.Label}] {Player.ConnectionInfo.Path} > ");
 			//	Console.WriteLine($"/ [{Player.ConnectionInfo.User.Username} @ {Player.ConnectionInfo.PC.Address}]");
