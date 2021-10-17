@@ -13,7 +13,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Lawful.GameObjects\Lawful.GameLibrary.csproj" />
     <ProjectReference Include="..\..\Lawful\Lawful.csproj" />
   </ItemGroup>
 

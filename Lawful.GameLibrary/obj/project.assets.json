@@ -2,19 +2,6 @@
   "version": 3,
   "targets": {
     "net5.0": {
-      "Lawful.GameLibrary/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v5.0",
-        "dependencies": {
-          "Lawful.InputParser": "1.0.0"
-        },
-        "compile": {
-          "bin/placeholder/Lawful.GameLibrary.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Lawful.GameLibrary.dll": {}
-        }
-      },
       "Lawful.InputParser/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
@@ -28,11 +15,6 @@
     }
   },
   "libraries": {
-    "Lawful.GameLibrary/1.0.0": {
-      "type": "project",
-      "path": "../Lawful.GameLibrary/Lawful.GameLibrary.csproj",
-      "msbuildProject": "../Lawful.GameLibrary/Lawful.GameLibrary.csproj"
-    },
     "Lawful.InputParser/1.0.0": {
       "type": "project",
       "path": "../Lawful.InputParser/Lawful.InputParser.csproj",
@@ -41,7 +23,6 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "Lawful.GameLibrary >= 1.0.0",
       "Lawful.InputParser >= 1.0.0"
     ]
   },
@@ -51,11 +32,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful\\Lawful.csproj",
-      "projectName": "Lawful",
-      "projectPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful\\Lawful.csproj",
+      "projectUniqueName": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameLibrary\\Lawful.GameLibrary.csproj",
+      "projectName": "Lawful.GameLibrary",
+      "projectPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameLibrary\\Lawful.GameLibrary.csproj",
       "packagesPath": "C:\\Users\\Carson\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful\\obj\\",
+      "outputPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameLibrary\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Carson\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -72,9 +53,6 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
-            "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameLibrary\\Lawful.GameLibrary.csproj": {
-              "projectPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.GameLibrary\\Lawful.GameLibrary.csproj"
-            },
             "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.InputParser\\Lawful.InputParser.csproj": {
               "projectPath": "C:\\Users\\Carson\\source\\repos\\LawfulGame\\Lawful.InputParser\\Lawful.InputParser.csproj"
             }

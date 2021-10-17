@@ -8,8 +8,7 @@
     ".NETCoreApp,Version=v5.0": {
       "shouldersofgiants/1.0.0": {
         "dependencies": {
-          "Lawful": "1.0.0",
-          "Lawful.GameLibrary": "1.0.0"
+          "Lawful": "1.0.0"
         },
         "runtime": {
           "shouldersofgiants.dll": {}
