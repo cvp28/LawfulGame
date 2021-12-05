@@ -1,21 +1,18 @@
-﻿using System;
-using System.Threading;
-
-using static Lawful.GameLibrary.Session;
-
-namespace Lawful
+﻿namespace Lawful.GameLibrary
 {
+	using static GameSession;
+
 	public static class Util
 	{
 		public static void PrintPrompt()
 		{
 			Console.Write("/ [");
-			WriteColor(Player.ConnectionInfo.User.Username, ConsoleColor.Green);
+			WriteColor(Player.CurrentSession.User.Username, ConsoleColor.Green);
 			Console.Write("] [");
-			WriteColor(Player.ConnectionInfo.PC.Address, ConsoleColor.Green);
+			WriteColor(Player.CurrentSession.Host.Address, ConsoleColor.Green);
 			Console.WriteLine(']');
 
-			Console.Write($"\\ {Player.ConnectionInfo.Path} > ");
+			Console.Write($"\\ {Player.CurrentSession.PathNode.GetPath()} > ");
 
 			//	Console.Write($"\\ [{Player.ConnectionInfo.Drive.Label}] {Player.ConnectionInfo.Path} > ");
 			//	Console.WriteLine($"/ [{Player.ConnectionInfo.User.Username} @ {Player.ConnectionInfo.PC.Address}]");
@@ -61,6 +58,7 @@ namespace Lawful
 
 			Console.CursorVisible = false;
 			string Input = Console.ReadLine();
+			Console.CursorTop--;
 			Console.CursorVisible = true;
 
 
@@ -127,6 +125,38 @@ namespace Lawful
 			Console.SetCursorPosition(Position.X, Position.Y);
 
 			Console.CursorVisible = true;
+		}
+
+		// Basic login handler with a max tries counter
+		// MaxTries set to 0 means infinite tries
+		public static bool TryUserLogin(UserAccount Account, int MaxTries = 0)
+		{
+			if (Account.Password.Length == 0)
+				return true;
+
+			string Password;
+			int Tries = 0;
+
+			do
+			{
+				if (MaxTries > 0)
+					if (Tries == MaxTries)
+						return false;
+
+				if (MaxTries > 0)
+					Console.Write($"({MaxTries - Tries}) ");
+
+				Console.WriteLine($"Password for '{Account.Username}': ");
+				Password = ReadLineSecret();
+
+				Tries++;
+
+				if (Password == "$cancel")
+					return false;
+			}
+			while (Password != Account.Password);
+
+			return true;
 		}
 	}
 }

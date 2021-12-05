@@ -1,13 +1,10 @@
-﻿<Root>
-	<Directory Name="home">
-		<File Name="test.txt">
-			This is a test document
-		</File>
-		<Directory Name="Konym">
-			<Directory Name="Documents">
-				<Directory Name="not porn">
-					<Directory Name="School">
-						<File Name="UsHist Chapter 11 &amp; 12 Outline.docx">
+﻿<Root Perms="root:77">
+	<Directory Name="home" Perms="root:64">
+		<Directory Name="Konym" Perms="Konym:60">
+			<Directory Name="Documents" Perms="Konym:64">
+				<Directory Name="not porn" Perms="Konym:64">
+					<Directory Name="School" Perms="Konym:64">
+						<File Name="UsHist Chapter 11 &amp; 12 Outline.docx" Perms="Konym:74">
 1. Samuel Slater
 Went to U.S. and founded Slater's Mills
 2. Eli Whitney
@@ -36,11 +33,11 @@ Slave Rebellion
 					</Directory>
 				</Directory>
 
-				<File Name="US National Anthem Vocoded to Gangsta's Paradise.mp3"/>
-				<File Name="hiresdefault.png"/>
-				<File Name="netScan" Command="scan"/>
+				<File Name="US National Anthem Vocoded to Gangsta's Paradise.mp3" Perms="Konym:74"/>
+				<File Name="hiresdefault.png" Perms="Konym:74"/>
+				<File Name="netScan" Command="scan" Perms="Konym:75"/>
 
-				<File Name="todo.txt">
+				<File Name="todo.txt" Perms="Konym:74">
 1. email teacher about attendance
 2. apply to del taco
 3. ask out that girl in 5th period
@@ -51,37 +48,37 @@ Slave Rebellion
 		</Directory>
 	</Directory>
 
-	<Directory Name="sys">
-		<File Name="kguilib.sys"/>
-		<File Name="netman.sys"/>
-		<File Name="kcmk.sys"/>
-		<File Name="sfs.sys"/>
+	<Directory Name="sys" Perms="root:64">
+		<File Name="kguilib.sys" Perms="root:70"/>
+		<File Name="netman.sys" Perms="root:70"/>
+		<File Name="kcmk.sys" Perms="root:70"/>
+		<File Name="sfs.sys" Perms="root:70"/>
 	</Directory>
 
-	<Directory Name="bin">
-		<File Name="ssh" Command="ssh"/>
-		<File Name="su" Command="su"/>
-		<File Name="ls" Command="ls"/>
-		<File Name="cd" Command="cd"/>
-		<File Name="mv" Command="mv"/>
-		<File Name="rm" Command="rm"/>
-		<File Name="cr" Command="cr"/>
-		<File Name="cat" Command="cat"/>
-		<File Name="sus" Command="sus"/>
-		<File Name="clear" Command="clear"/>
-		<File Name="dc" Command="dc"/>
-		<File Name="pwd" Command="pwd"/>
-		<File Name="scp" Command="scp"/>
+	<Directory Name="bin" Perms="root:64">
+		<File Name="ssh" Command="ssh" Perms="root:75"/>
+		<File Name="su" Command="su" Perms="root:75"/>
+		<File Name="ls" Command="ls" Perms="root:75"/>
+		<File Name="cd" Command="cd" Perms="root:75"/>
+		<File Name="mv" Command="mv" Perms="root:75"/>
+		<File Name="rm" Command="rm" Perms="root:75"/>
+		<File Name="cat" Command="cat" Perms="root:75"/>
+		<File Name="sus" Command="sus" Perms="root:75"/>
+		<File Name="clear" Command="clear" Perms="root:75"/>
+		<File Name="dc" Command="dc" Perms="root:75"/>
+		<File Name="pwd" Command="pwd" Perms="root:75"/>
+		<File Name="scp" Command="scp" Perms="root:75"/>
+		<File Name="mkdir" Command="mkdir" Perms="root:75"/>
 	</Directory>
 
-	<Directory Name="www-root">
-		<File Name="index.html"/>
+	<Directory Name="www-root" Perms="www-root:64">
+		<File Name="index.html" Perms="www-root:74"/>
 
-		<Directory Name="content">
-			<File Name="content.css"/>
+		<Directory Name="content" Perms="www-root:64">
+			<File Name="content.css" Perms="www-root:74"/>
 		</Directory>
 
-		<File Name="jermasus.txt">
+		<File Name="jermasus.txt" Perms="www-root:74">
 .   ....../#########((#(*,. ,...,,,,,......,..........,**((((/#(/////////////////
 ........../(######(/*,,.,......,.......................,,***/(#(#(///////////////
 ,(###(//,,,,...,*.............,,....,,,.....,,.,*///((((///////////////

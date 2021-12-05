@@ -1,78 +1,89 @@
-﻿using System;
-using System.Xml;
+﻿using System.Xml;
 using System.Xml.Serialization;
-using System.Linq;
-using System.Collections.Generic;
 
-namespace Lawful.GameLibrary
+namespace Lawful.GameLibrary;
+
+public class Computer
 {
-	public class Computer
+	[XmlAttribute("Name")]
+	public string Name;
+
+	[XmlAttribute("Address")]
+	public string Address;
+
+	[XmlElement("ScanResult")]
+	public List<ScanResult> ScanResults;
+
+	[XmlElement("Account")]
+	public List<UserAccount> Accounts;
+
+	[XmlElement("Root")]
+	public XmlNode? FileSystemRoot;
+
+	public Computer() { }
+
+	public Computer(string Name, string Address)
 	{
-		[XmlAttribute("Name")]
-		public string Name;
+		this.Name = Name;
+		this.Address = Address;
 
-		[XmlAttribute("Address")]
-		public string Address;
+		ScanResults = new();
 
-		[XmlElement("ScanResult")]
-		public List<ScanResult> ScanResults;
+		Accounts = new();
+		Accounts.Add(new UserAccount("root", String.Empty));
+	}
 
-		[XmlElement("Account")]
-		public List<UserAccount> Accounts;
+	public Computer(string Name, string Address, string RootPassword)
+	{
+		this.Name = Name;
+		this.Address = Address;
 
-		[XmlElement("Root")]
-		public XmlNode FileSystemRoot;
+		ScanResults = new();
 
-		public Computer() { }
+		Accounts = new();
+		Accounts.Add(new("root", RootPassword));
+	}
 
-		public Computer(string Name, string Address)
+	public UserAccount? GetRootUser() => Accounts.FirstOrDefault(account => account.Username.ToUpper() == "ROOT");
+
+	public UserAccount? GetUser(string Username) => Accounts.FirstOrDefault(user => user.Username == Username);
+
+	public bool HasUser(string Username) => Accounts.Any(user => user.Username == Username);
+
+	public bool AddUser(UserAccount Account)
+	{
+		if (Accounts.Any(account => account.Username == Account.Username)) { return false; }
+
+		Accounts.Add(Account);
+		return true;
+	}
+
+	public bool RemoveUser(string Username)
+	{
+		if (Username.ToUpper() == "ROOT")
+			return false;
+
+		UserAccount? Account = Accounts.FirstOrDefault(user => user.Username == Username);
+
+		if (Account is null) { return false; }
+
+		Accounts.Remove(Account);
+
+		return true;
+	}
+
+	public bool TryOpenSession(string Username, out UserSession? Session)
+	{
+		UserAccount TryUser = GetUser(Username);
+
+		if (TryUser is null)
 		{
-			this.Name = Name;
-			this.Address = Address;
-
-			ScanResults = new();
-
-			Accounts = new();
-			Accounts.Add(new UserAccount("root", String.Empty));
+			Session = null;
+			return false;
 		}
 
-		public Computer(string Name, string Address, string RootPassword)
-		{
-			this.Name = Name;
-			this.Address = Address;
+		Session = new() { Host = this, User = TryUser, PathNode = FileSystemRoot };
 
-			ScanResults = new();
-
-			Accounts = new();
-			Accounts.Add(new("root", RootPassword));
-		}
-
-		public UserAccount GetRootUser() => Accounts.FirstOrDefault(account => account.Username == "Root");
-
-		public UserAccount GetUser(string Username) => Accounts.FirstOrDefault(user => user.Username == Username);
-
-		public bool HasUser(string Username) => Accounts.Any(user => user.Username == Username);
-
-		public bool AddUser(UserAccount Account)
-		{
-			if (Accounts.Any(account => account.Username == Account.Username)) { return false; }
-
-			Accounts.Add(Account);
-			return true;
-		}
-
-		public bool RemoveUser(string Username)
-		{
-			if (Username.ToUpper() == "ROOT")
-				return false;
-
-			UserAccount Account = Accounts.FirstOrDefault(user => user.Username == Username);
-
-			if (Account is null) { return false; }
-
-			Accounts.Remove(Account);
-
-			return true;
-		}
+		return true;
 	}
 }

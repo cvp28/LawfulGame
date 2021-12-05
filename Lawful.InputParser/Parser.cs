@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
+using System;
 
 namespace Lawful.InputParser
 {
@@ -24,15 +23,14 @@ namespace Lawful.InputParser
         }
     }
 
-
     public static class Parser
-    {
+	{
         public static InputQuery Parse(string Input)
         {
             string Command;
-            Dictionary<string, string> NamedArgs = new Dictionary<string, string>();
-            List<string> Flags = new List<string>();
-            List<string> Args = new List<string>();
+            Dictionary<string, string> NamedArgs = new();
+            List<string> Flags = new();
+            List<string> Args = new();
 
             // We begin parsing here
             // Big clusterfuck regexes to follow
@@ -40,7 +38,7 @@ namespace Lawful.InputParser
             if (Input.Split(' ').Length > 1)
             {
                 Command = Input.Split(' ')[0];
-                Input = Input.Substring(Command.Length + 1) + " ";
+                Input = string.Concat(Input.AsSpan(Command.Length + 1), " ");
 
 
                 // Get named arguments (with quoted values)
@@ -84,14 +82,14 @@ namespace Lawful.InputParser
                 foreach (Match mFlag in Regex.Matches(Input, @"--\w*\s"))
                 {
                     string match = mFlag.Value;
-                    match = match.Substring(2).Trim();
+                    match = match[2..].Trim();
                     Flags.Add(match);
                     Input = Input.Replace(mFlag.Value, "");
                 }
 
 
                 // Get single-word arguments
-                Input.Trim();
+                Input = Input.Trim();
                 foreach (string arg in Input.Split(' '))
                 {
                     if (arg.Length > 0)

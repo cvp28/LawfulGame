@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Xml;
+﻿using System.Xml;
 using System.Xml.Serialization;
 
 namespace Lawful.GameLibrary
@@ -12,6 +10,9 @@ namespace Lawful.GameLibrary
 
 		[XmlIgnore]
 		public UserAccount Account;
+
+		[XmlIgnore]
+		public UserSession CurrentSession;
 
 		[XmlIgnore]
 		internal string ReferenceHomeAddress;
@@ -40,19 +41,16 @@ namespace Lawful.GameLibrary
 		[XmlAttribute("ProfileName")]
 		public string ProfileName { get; set; }
 
-		[XmlIgnore]
-		public ConnectionInfo ConnectionInfo;
-
 		/// <summary>
-		/// Used for serialization, use ConnectionInfo for all User connection data
+		/// Used for serialization, use CurrentSession for all User connection data
 		/// </summary>
 		[XmlElement("CurrentConnection")]
-		public ConnectionInfoReference ConnectionReference;
+		public SessionReference CurrentSessionReference;
 
 		public User()
 		{
-			ConnectionInfo = new();
-			ConnectionReference.PlayerReference = this;
+			CurrentSession = new();
+			CurrentSessionReference.PlayerReference = this;
 		}
 
 		public void SerializeToFile(string Path)
@@ -64,7 +62,7 @@ namespace Lawful.GameLibrary
 			xs.Serialize(fs, this);
 		}
 	
-		public static User DeserializeFromFile(string Path)
+		public static User? DeserializeFromFile(string Path)
 		{
 			if (!File.Exists(Path))
 				throw new Exception($"Could not find file referenced by '{Path}'");
@@ -81,9 +79,26 @@ namespace Lawful.GameLibrary
 			HomePC = ComputerStructure.GetComputer(ReferenceHomeAddress);
 			Account = HomePC.GetUser(ReferenceUsername);
 
-			ConnectionInfo.PC = ComputerStructure.GetComputer(ConnectionReference.ReferenceAddress);
-			ConnectionInfo.User = ConnectionInfo.PC.GetUser(ConnectionReference.ReferenceUsername);
-			ConnectionInfo.PathNode = ConnectionInfo.PC.GetNodeFromPath(ConnectionReference.ReferencePath);
+			CurrentSession.Host = ComputerStructure.GetComputer(CurrentSessionReference.ReferenceAddress);
+			CurrentSession.User = CurrentSession.Host.GetUser(CurrentSessionReference.ReferenceUsername);
+			CurrentSession.PathNode = CurrentSession.Host.GetNodeFromPath(CurrentSessionReference.ReferencePath);
+		}
+
+		// Call ONLY after HomePC and Account have been created
+		public void InstantiateSession()
+		{
+			if (CurrentSession is not null)
+				CloseCurrentSession();
+
+			HomePC.TryOpenSession(ProfileName, out CurrentSession);
+		}
+
+		public void CloseCurrentSession()
+		{
+			CurrentSession.Host = null;
+			CurrentSession.User = null;
+			CurrentSession.PathNode = null;
+			CurrentSession = null;
 		}
 	}
 }

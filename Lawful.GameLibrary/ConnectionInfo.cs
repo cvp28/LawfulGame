@@ -1,15 +1,14 @@
 ﻿using System.Xml;
 
-namespace Lawful.GameLibrary
+namespace Lawful.GameLibrary;
+
+public class ConnectionInfo
 {
-    public class ConnectionInfo
-    {
-        public string Path { get { return PathNode.GetPath(); } }
+    public string Path { get { return PathNode.GetPath(); } }
 
-        public Computer PC;
+    public Computer PC;
 
-        public XmlNode PathNode;
+    public XmlNode PathNode;
 
-        public UserAccount User;
-    }
+    public UserAccount User;
 }

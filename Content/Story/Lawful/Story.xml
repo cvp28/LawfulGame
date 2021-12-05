@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
-<Story xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Lawful" Start="shouldersofgiants">
-  <Mission Name="Stood Upon the Shoulders of Giants" ID="shouldersofgiants" AssemblyPath="Missions\shouldersofgiants\net5.0\shouldersofgiants.dll" />
+<Story xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Lawful" Start="Intro">
+  <Mission Name="Humble Beginnings (Intro)" ID="Intro" AssemblyPath="Missions\Intro\Release\net6.0\Intro.dll" />
 </Story>

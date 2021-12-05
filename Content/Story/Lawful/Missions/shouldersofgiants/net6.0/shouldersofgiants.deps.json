@@ -1,0 +1,49 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "shouldersofgiants/1.0.0": {
+        "dependencies": {
+          "Lawful.GameLibrary": "1.0.0"
+        },
+        "runtime": {
+          "shouldersofgiants.dll": {}
+        }
+      },
+      "Lawful.GameLibrary/1.0.0": {
+        "dependencies": {
+          "Lawful.InputParser": "1.0.0"
+        },
+        "runtime": {
+          "Lawful.GameLibrary.dll": {}
+        }
+      },
+      "Lawful.InputParser/1.0.0": {
+        "runtime": {
+          "Lawful.InputParser.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "shouldersofgiants/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Lawful.GameLibrary/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Lawful.InputParser/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

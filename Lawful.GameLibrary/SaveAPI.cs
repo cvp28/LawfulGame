@@ -1,14 +1,11 @@
-﻿using System;
-using System.IO;
-
-using static Lawful.GameLibrary.Session;
-
-namespace Lawful.GameLibrary
+﻿namespace Lawful.GameLibrary
 {
+	using static GameSession;
+
 	public static class SaveAPI
 	{
-		// We return a bool and a string determing if:
-		// a. the save initialization was successful
+		// We return a bool and a string containing:
+		// a. if the save initialization was successful
 		// and
 		// b. the path to the user's save file
 		public static (bool, string) InitSave(string UserPCName, string UserProfileName, string UserStorySelection)
@@ -51,9 +48,8 @@ namespace Lawful.GameLibrary
 				User.HomePC = UserPC;
 				User.Account = UserAccount;
 
-				User.ConnectionInfo.PC = User.HomePC;
-				User.ConnectionInfo.User = User.Account;
-				User.ConnectionInfo.PathNode = User.ConnectionInfo.PC.FileSystemRoot;
+				// This will automatically create the session that we are going to serialize with the rest of the user class that will have all of our connection data bundled in when we load the save
+				User.InstantiateSession();
 
 				User.SerializeToFile($@"{PathToNewSaveFolder}\User.xml");
 
@@ -84,6 +80,8 @@ namespace Lawful.GameLibrary
 
 			// Initialize some connection-related values given the computer structure for this save
 			Player.PostDeserializationInit(Computers);
+
+			Player.HomePC.TryOpenSession(Player.ProfileName, out Player.CurrentSession);
 
 			Events = new();
 

@@ -1,0 +1,41 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "cfc95b00-d060-4898-8abf-40263210eb7d": {
+      "ProjectGuid": "cfc95b00-d060-4898-8abf-40263210eb7d",
+      "DisplayName": "Lawful",
+      "ColorIndex": 0
+    },
+    "6f4158e9-5f63-44cf-9c21-a5324d202688": {
+      "ProjectGuid": "6f4158e9-5f63-44cf-9c21-a5324d202688",
+      "DisplayName": "Lawful.GameLibrary",
+      "ColorIndex": 1
+    },
+    "e8cdb452-6ba9-4a68-9cda-4c69310ad1b9": {
+      "ProjectGuid": "e8cdb452-6ba9-4a68-9cda-4c69310ad1b9",
+      "DisplayName": "Lawful",
+      "ColorIndex": 2
+    },
+    "7b9deed1-5b19-4988-addd-9449f2c46570": {
+      "ProjectGuid": "7b9deed1-5b19-4988-addd-9449f2c46570",
+      "DisplayName": "Lawful.InputParser",
+      "ColorIndex": 3
+    },
+    "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3": {
+      "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
+      "DisplayName": "Miscellaneous Files",
+      "ColorIndex": -1
+    },
+    "3580a7c8-3484-4e2b-90ce-d309275a0b3a": {
+      "ProjectGuid": "3580a7c8-3484-4e2b-90ce-d309275a0b3a",
+      "DisplayName": "Intro",
+      "ColorIndex": 4
+    },
+    "ccbcd583-2429-477a-8ccc-29790cd013be": {
+      "ProjectGuid": "ccbcd583-2429-477a-8ccc-29790cd013be",
+      "DisplayName": "Solution Items",
+      "ColorIndex": 5
+    }
+  },
+  "NextColorIndex": 6
+}

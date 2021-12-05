@@ -1,707 +1,765 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Xml;
-using System.Collections.Generic;
 
 using Lawful.InputParser;
 using Lawful.GameLibrary;
 
-using static Lawful.GameLibrary.Session;
+using static Lawful.GameLibrary.GameSession;
 
-namespace Lawful
+namespace Lawful;
+
+public static class Commands
 {
-    public static class Commands
-    {
-        public static void SSH(InputQuery Query)
-		{
-            if (Query.Arguments.Count > 0)
-            {
-                string[] LoginQuery = Query.Arguments[0].Split('@', StringSplitOptions.RemoveEmptyEntries);
+    public static void SSH(InputQuery Query)
+	{
+        if (Query.Arguments.Count > 0)
+        {
+            string[] LoginQuery = Query.Arguments[0].Split('@', StringSplitOptions.RemoveEmptyEntries);
 
-                if (LoginQuery.Length < 2)
-				{
-					Console.WriteLine("Insufficient parameters");
-                    return;
-				}
-
-                string Username = LoginQuery[0];
-                string Hostname = LoginQuery[1];
-
-                // Error checking
-                if (!IPAddress.TryParse(Hostname, out IPAddress TryIP))
-                {
-					Util.WriteLineColor("Invalid IP address specified", ConsoleColor.Red);
-                    return;
-                }
-
-                if (Player.ConnectionInfo.PC.Address == TryIP.ToString())
-                {
-                    Util.WriteLineColor("Already connected to that machine, cannot perform SSH connection", ConsoleColor.Red);
-                    return;
-                }
-
-                Util.WriteColor($"Trying connection to '{TryIP}' ", ConsoleColor.Yellow);
-
-                Util.BeginSpinningCursorAnimation(new string[4] { "▀", "■", "▄", "■" }, 8, 32, 75, Console.GetCursorPosition());
-
-                Console.Write("- ");
-
-                if (!Computers.HasComputer(TryIP.ToString()))
-				{
-					Util.WriteLineColor($"could not find a node at the IP address: '{TryIP}'", ConsoleColor.Red);
-                    return;
-				}
-
-                // Hostname is valid at this point, check Username
-
-                Computer TryPC = Computers.GetComputer(TryIP.ToString());
-
-                if (!TryPC.HasUser(Username))
-				{
-					Util.WriteLineColor($"node at IP '{TryIP}' does not contain user '{Username}'", ConsoleColor.Red);
-                    return;
-				}
-
-
-				Util.WriteLineColor("connected", ConsoleColor.Green);
-
-                // Both are valid at this point, check if user has a password. If so, start login.
-                UserAccount TryUser = TryPC.GetUser(Username);
-                
-                if (TryUser.Password.Length > 0)
-				{
-                PasswordPrompt:
-
-                    Console.Write("Password: ");
-                    string Password = Util.ReadLineSecret();
-
-                    if (Password != TryUser.Password)
-                        goto PasswordPrompt;
-				}
-
-                Util.WriteLineColor($"Logged in as user '{Username}' at the connected node '{TryIP}'", ConsoleColor.Green);
-
-                Player.ConnectionInfo.PC = TryPC;
-
-                Player.ConnectionInfo.User = TryUser;
-                Player.ConnectionInfo.PathNode = Player.ConnectionInfo.PC.FileSystemRoot;
-
-                Events.FireSSHConnect(Player, Computers, Query, Events);
-            }
-		}
-
-        public static void SwitchUser(InputQuery Query)
-		{
-            if (Query.Arguments.Count < 1)
+            if (LoginQuery.Length < 2)
 			{
 				Console.WriteLine("Insufficient parameters");
                 return;
 			}
 
-            string Username = Query.Arguments[0];
+            string Username = LoginQuery[0];
+            string Hostname = LoginQuery[1];
 
-            UserAccount TryAccount = Player.ConnectionInfo.PC.GetUser(Username);
+            // Error checking
+            if (!IPAddress.TryParse(Hostname, out IPAddress TryIP))
+            {
+				Util.WriteLineColor("Invalid IP address specified", ConsoleColor.Red);
+                return;
+            }
 
-            if (TryAccount is null)
+            if (Player.CurrentSession.Host.Address == TryIP.ToString())
+            {
+                Util.WriteLineColor("Already connected to that machine, cannot perform SSH connection", ConsoleColor.Red);
+                return;
+            }
+
+            Util.WriteColor($"Trying connection to '{TryIP}' ", ConsoleColor.Yellow);
+
+            Util.BeginSpinningCursorAnimation(new string[4] { "▀", "■", "▄", "■" }, 8, 32, 75, Console.GetCursorPosition());
+
+            Console.Write("- ");
+
+            if (!Computers.HasComputer(TryIP.ToString()))
 			{
-				Console.WriteLine($"Could not find a user by the username '{Username}'");
+				Util.WriteLineColor($"could not find a node at the IP address: '{TryIP}'", ConsoleColor.Red);
                 return;
 			}
 
-            if (TryAccount.Password.Length > 0)
+            // Hostname is valid at this point, check Username
+
+            Computer TryPC = Computers.GetComputer(TryIP.ToString());
+
+            if (!TryPC.HasUser(Username))
 			{
-                // Login code
-                string Input;
-
-                do
-                {
-                    Console.Write("Password: ");
-                    Input = Util.ReadLineSecret();
-                }
-                while (Input != TryAccount.Password);
-
-				Console.WriteLine();
+				Util.WriteLineColor($"node at IP '{TryIP}' does not contain user '{Username}'", ConsoleColor.Red);
+                return;
 			}
 
-            // Actually switch to the user now
-            Player.ConnectionInfo.User = TryAccount;
 
-            Util.WriteColor("Success!", ConsoleColor.Green);
-            Util.WriteLineColor($" :: Session now active for user '{Player.ConnectionInfo.User.Username}'", ConsoleColor.Yellow);
+			Util.WriteLineColor("connected", ConsoleColor.Green);
+
+            // Both are valid at this point, check if user has a password. If so, start login.
+            UserAccount TryUser = TryPC.GetUser(Username);
+                
+            if (!Util.TryUserLogin(TryUser, 3))
+			{
+				Util.WriteLineColor("Connection closed by 3 invalid login attempts", ConsoleColor.Red);
+                return;
+			}
+
+            Util.WriteLineColor($"Logged in as user '{Username}' at the connected node '{TryIP}'", ConsoleColor.Green);
+
+            Player.CloseCurrentSession();
+			TryPC.TryOpenSession(Username, out Player.CurrentSession);
+
+            Events.FireSSHConnect(Player, Computers, Query, Events);
+        }
+	}
+
+    public static void SwitchUser(InputQuery Query)
+	{
+        if (Query.Arguments.Count < 1)
+		{
+			Console.WriteLine("Insufficient parameters");
+            return;
 		}
 
-        public static void Scan(InputQuery Query)
+        string Username = Query.Arguments[0];
+
+        UserAccount TryAccount = Player.CurrentSession.Host.GetUser(Username);
+
+        if (TryAccount is null)
+		{
+			Console.WriteLine($"Could not find a user by the username '{Username}'");
+            return;
+		}
+
+        if (!Util.TryUserLogin(TryAccount, 3))
+		{
+			Console.WriteLine("Login cancelled or 3 invalid attempts were made");
+            return;
+		}
+
+        // Actually switch to the user now
+        Player.CurrentSession.User = TryAccount;
+
+        Util.WriteColor("Success!", ConsoleColor.Green);
+        Util.WriteLineColor($" :: Session now active for user '{Player.CurrentSession.User.Username}'", ConsoleColor.Yellow);
+	}
+
+    public static void Scan(InputQuery Query)
+    {
+        Console.Write("Scanning... ");
+
+        Util.BeginSpinningCursorAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 16, 48, 50, Console.GetCursorPosition());
+
+        Util.WriteLineColor("done!", ConsoleColor.Green);
+		Console.WriteLine();
+
+        if (Player.CurrentSession.Host.ScanResults.Count > 0)
         {
-            Console.Write("Scanning... ");
+			Console.WriteLine("Responses received:");
 
-            Util.BeginSpinningCursorAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 16, 48, 50, Console.GetCursorPosition());
+            foreach (ScanResult Result in Player.CurrentSession.Host.ScanResults)
+                Util.WriteLineColor($"    {Result.Name}@{Result.Address}", ConsoleColor.Yellow);
+        }
+        else
+        {
+			Console.WriteLine("Scan did not find any PCs open to the internet");
+		}
+    }
 
-            Util.WriteLineColor("done!", ConsoleColor.Green);
-			Console.WriteLine();
+    private static List<UserSession> ActiveSessions = new();
 
-            if (Player.ConnectionInfo.PC.ScanResults.Count > 0)
+    // TODO (Carson): Figure out a way to check for permissions on the origin and destination(s) via the repsective users accessing them
+
+    public static void SecureCopy(InputQuery Query)
+	{
+        if (Query.Arguments.Count == 0)
+		{
+			Util.WriteLineColor("Insufficent arguments", ConsoleColor.Red);
+            return;
+		}
+
+        string Path;
+        UserSession Current;
+
+        if (Remote.TryGetRSI(Query.Arguments[0], out UserAccount RemoteOriginUser, out Computer RemoteOriginHost, out string RemoteOriginPath) == RSIStatus.Complete)
+		{
+            Util.WriteLineColor($"Connected to {RemoteOriginHost.Address}!", ConsoleColor.Green);
+            // remote origin
+            if (!Util.TryUserLogin(RemoteOriginUser, 3))
             {
-				Console.WriteLine("Responses received:");
-
-                foreach (ScanResult Result in Player.ConnectionInfo.PC.ScanResults)
-                    Util.WriteLineColor($"    {Result.Name}@{Result.Address}", ConsoleColor.Yellow);
+                Util.WriteLineColor("Login cancelled or 3 invalid attempts were made", ConsoleColor.Red);
+                return;
             }
-            else
-            {
-				Console.WriteLine("Scan did not find any PCs open to the internet");
-			}
+
+            Path = RemoteOriginPath;
+            Current = UserSession.FromConstituents(RemoteOriginHost, RemoteOriginUser);
+            ActiveSessions.Add(Current);
+        }
+        else
+		{
+            // local origin
+            Path = Query.Arguments[0];
+            Current = Player.CurrentSession;
         }
 
-        private static List<Computer> ConnectedPCs = new();
-        private static List<UserAccount> LoggedInAccounts = new();
+        dynamic Origin = FSAPI.Locate(Current, Path);
 
-        public static void SecureCopy(InputQuery Query)
+        switch (Origin)
 		{
-            if (Query.Arguments.Count == 0)
-			{
-				Console.WriteLine("Insufficient arguments");
+            case XmlNode n:
+
+                break;
+
+            case XmlNodeList nl:
+
+                break;
+
+            default:
+                Util.WriteLineColor($"Could not locate '{Path}'", ConsoleColor.Red);
                 return;
-			}
+		}
 
-            if (Query.Arguments.Count == 1)
+        // At this point, we have an origin but we do not know where to put it
+
+        if (Query.Arguments.Count >= 2)
+		{
+            XmlNode Destination;
+
+            // For every argument after the origin
+            for (int i = 1; i < Query.Arguments.Count; i++)
 			{
-                (bool Succeeded, dynamic Source) Arg1 = HandleOtherSCPArg(Query.Arguments[0]);
+                if (Remote.TryGetRSI(Query.Arguments[i], out UserAccount RemoteDestinationUser, out Computer RemoteDestinationHost, out string RemoteDestinationPath) == RSIStatus.Complete)
+				{
+                    // If, for every session, it is true that this remote query does not remote query does not reference it, we know it is not in the list of active sessions and must be validated
+                    if (ActiveSessions.TrueForAll(session => session.User != RemoteDestinationUser && session.Host != RemoteDestinationHost))
+                    {
+                        // remote origin
+                        if (!Util.TryUserLogin(RemoteDestinationUser, 3))
+                        {
+                            Util.WriteLineColor("Login cancelled or 3 invalid attempts were made", ConsoleColor.Red);
+                            return;
+                        }
 
-                XmlNode UserDir = Player.HomePC.GetNodeFromPath($"/home/{Player.ProfileName}");
-                XmlNode UserBin = Player.HomePC.GetNodeFromPath("/bin");
+                        Current = UserSession.FromConstituents(RemoteDestinationHost, RemoteDestinationUser);
+                        ActiveSessions.Add(Current);
+                    }
 
-                if (!Arg1.Succeeded) // The argument handler already prints our error messages for us so we just have to return
-                {
-                    ConnectedPCs.Clear();
-                    LoggedInAccounts.Clear();
-                    return;
+                    Current = ActiveSessions.Find(session => session.User == RemoteDestinationUser && session.Host == RemoteDestinationHost);
+                    Destination = FSAPI.LocateDirectory(Current, RemoteDestinationPath);
+
+                    if (Destination is null)
+					{
+                        Util.WriteLineColor($"Could not find directory '{RemoteDestinationPath}' at {RemoteDestinationHost.Address}", ConsoleColor.Red);
+                        return;
+					}
                 }
+                else
+				{
+                    Destination = FSAPI.LocateDirectory(Player.CurrentSession, Query.Arguments[i]);
 
-                switch (Arg1.Source)
+                    if (Destination is null)
+                    {
+                        Util.WriteLineColor($"Could not find directory '{Query.Arguments[i]}'", ConsoleColor.Red);
+                        return;
+                    }
+                }
+                    
+                // Copy the file(s) here (check for permissions first!)
+                switch (Origin)
 				{
                     case XmlNode n:
-                        if (n.Attributes["Command"] is not null)
-                            AnimatedFileTransfer(n, UserBin);
-                        else
-                            AnimatedFileTransfer(n, UserDir);
+                        // Check for permissions here
+
+                        AnimatedFileTransfer(n, Destination);
                         break;
 
                     case XmlNodeList nl:
                         foreach (XmlNode n in nl)
 						{
-                            if (n.Attributes["Command"] is not null)
-                                AnimatedFileTransfer(n, UserBin);
-                            else
-                                AnimatedFileTransfer(n, UserDir);
-                        }
+
+						}
                         break;
 				}
 			}
-            else
-			{
-                (bool Succeeded, dynamic Source) Arg1 = HandleOtherSCPArg(Query.Arguments[0]);
-                (bool Succeeded, dynamic Source) Arg2 = HandleOtherSCPArg(Query.Arguments[1]);
+		}
+	}
 
-                if (!Arg1.Succeeded || !Arg2.Succeeded)
-                {
-                    ConnectedPCs.Clear();
-                    LoggedInAccounts.Clear();
-                    return;
-                }
+    public static void AnimatedFileTransfer(XmlNode Source, XmlNode Destination)
+    {
+        Console.CursorVisible = false;
 
-                // Sort out the destination
-                switch (Arg2.Source)
-				{
-                    case XmlNode n:
-                        if (n.Name != "Directory" && n.Name != "Root")
-                            goto default;       // Handly little feature, I must say
-                        break;
+        Util.WriteColor($"{Source.Attributes["Name"].Value,-40} -> {Destination.GetPath()} ", ConsoleColor.Yellow);
 
-                    default:
-						Console.WriteLine("Invalid destination, must be a folder");
-                        ConnectedPCs.Clear();
-                        LoggedInAccounts.Clear();
-                        return;
-				}
+        XmlNode ToCopy = Source.Clone();
+        Destination.AppendChild(ToCopy);
 
-                // Sort out the source
-                switch (Arg1.Source)
-                {
-                    case XmlNode n:
-                        AnimatedFileTransfer(n, Arg2.Source);
-                        break;
+        Util.BeginSpinningCursorAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 25, 150, 20, Console.GetCursorPosition());
+        Util.WriteLineColor("√", ConsoleColor.Green);
 
-                    case XmlNodeList nl:
-                        foreach (XmlNode n in nl)
-                            AnimatedFileTransfer(n, Arg2.Source);
-                        break;
-                }
-            }
-            ConnectedPCs.Clear();
-            LoggedInAccounts.Clear();
+        Console.CursorVisible = true;
+    }
+
+    //  private static List<Computer> ConnectedPCs = new();
+    //  private static List<UserAccount> LoggedInAccounts = new();
+    //  
+    //  public static void SecureCopy(InputQuery Query)
+    //  {
+    //      if (Query.Arguments.Count == 0)
+    //  	{
+    //  		Console.WriteLine("Insufficient arguments");
+    //          return;
+    //  	}
+    //  
+    //      if (Query.Arguments.Count == 1)
+    //  	{
+    //          (bool Succeeded, dynamic Source) Arg1 = HandleOtherSCPArg(Query.Arguments[0]);
+    //  
+    //          XmlNode UserDir = Player.HomePC.GetNodeFromPath($"/home/{Player.ProfileName}");
+    //          XmlNode UserBin = Player.HomePC.GetNodeFromPath("/bin");
+    //  
+    //          if (!Arg1.Succeeded) // The argument handler already prints our error messages for us so we just have to return
+    //          {
+    //              ConnectedPCs.Clear();
+    //              LoggedInAccounts.Clear();
+    //              return;
+    //          }
+    //  
+    //          switch (Arg1.Source)
+    //  		{
+    //              case XmlNode n:
+    //                  if (n.Attributes["Command"] is not null)
+    //                      AnimatedFileTransfer(n, UserBin);
+    //                  else
+    //                      AnimatedFileTransfer(n, UserDir);
+    //                  break;
+    //  
+    //              case XmlNodeList nl:
+    //                  foreach (XmlNode n in nl)
+    //  				{
+    //                      if (n.Attributes["Command"] is not null)
+    //                          AnimatedFileTransfer(n, UserBin);
+    //                      else
+    //                          AnimatedFileTransfer(n, UserDir);
+    //                  }
+    //                  break;
+    //  		}
+    //  	}
+    //      else
+    //  	{
+    //          (bool Succeeded, dynamic Source) Arg1 = HandleOtherSCPArg(Query.Arguments[0]);
+    //          (bool Succeeded, dynamic Source) Arg2 = HandleOtherSCPArg(Query.Arguments[1]);
+    //  
+    //          if (!Arg1.Succeeded || !Arg2.Succeeded)
+    //          {
+    //              ConnectedPCs.Clear();
+    //              LoggedInAccounts.Clear();
+    //              return;
+    //          }
+    //  
+    //          // Sort out the destination
+    //          switch (Arg2.Source)
+    //  		{
+    //              case XmlNode n:
+    //                  if (n.Name != "Directory" && n.Name != "Root")
+    //                      goto default;       // Handly little feature, I must say
+    //                  break;
+    //  
+    //              default:
+    //  				Console.WriteLine("Invalid destination, must be a folder");
+    //                  ConnectedPCs.Clear();
+    //                  LoggedInAccounts.Clear();
+    //                  return;
+    //  		}
+    //  
+    //          // Sort out the source
+    //          switch (Arg1.Source)
+    //          {
+    //              case XmlNode n:
+    //                  AnimatedFileTransfer(n, Arg2.Source);
+    //                  break;
+    //  
+    //              case XmlNodeList nl:
+    //                  foreach (XmlNode n in nl)
+    //                      AnimatedFileTransfer(n, Arg2.Source);
+    //                  break;
+    //          }
+    //      }
+    //      ConnectedPCs.Clear();
+    //      LoggedInAccounts.Clear();
+    //  }
+    //
+
+    //  
+    //  public static (bool, dynamic) HandleOtherSCPArg(string Argument)
+    //  {
+    //      // first we're going to determine the type of query
+    //      RSIStatus QueryRSIStatus = Remote.GetRSIStatus(Argument);
+    //  
+    //      dynamic Source;
+    //  
+    //      switch (QueryRSIStatus)
+    //      {
+    //          case RSIStatus.None:
+    //              // local query, use LocalLocate
+    //              Source = NodeLocator.LocalLocate(Argument, in Player.ConnectionInfo);
+    //              break;
+    //  
+    //          case RSIStatus.Complete:
+    //              // remote query, use RemoteLocate with new ConnectionInfo
+    //              string RSI = Argument.Split(':')[0];
+    //              string[] RSIElements = RSI.Split('@');
+    //  
+    //              Computer PC = Computers.GetComputer(RSIElements[1]);
+    //  
+    //              if (!ConnectedPCs.Contains(PC)) // If we do not already have an active session on this computer, create one.
+    //              {
+    //                  ConnectedPCs.Add(PC);
+    //  				Console.WriteLine($"Connected to {PC.Name}@{PC.Address}");
+    //              }
+    //  
+    //              UserAccount Account = PC.GetUser(RSIElements[0]);
+    //  
+    //              if (!LoggedInAccounts.Contains(Account))    // If we are not already logged in to this particular account, log in.
+    //  			{
+    //                  Util.DoUserLogin(Account, 3);
+    //                  LoggedInAccounts.Add(Account);
+    //              }
+    //  
+    //              ConnectionInfo New = new() { PC = Computers.GetComputer(RSIElements[1]), User = Account };
+    //              Source = NodeLocator.RemoteLocate(Argument, in New);
+    //              break;
+    //  
+    //          default:
+    //              Console.WriteLine($"Error in query '{QueryRSIStatus}'");
+    //              return (false, null);
+    //      }
+    //  
+    //      switch (Source)
+    //      {
+    //          case XmlNode n:
+    //              return (true, n);
+    //  
+    //          case XmlNodeList nl:
+    //              return (true, nl);
+    //  
+    //          default:
+    //              Console.WriteLine($"Unable to resolve source query '{Argument}'");
+    //              return (false, null);
+    //      }
+    //  }
+
+    public static void MakeDirectory(InputQuery Query)
+	{
+        if (Query.Arguments.Count == 0)
+		{
+			Console.WriteLine("Insufficient arguments");
+            return;
 		}
 
-        public static void AnimatedFileTransfer(XmlNode Source, XmlNode Destination)
+        foreach (string Argument in Query.Arguments)
 		{
-            Console.CursorVisible = false;
+            if (Remote.GetRSIStatus(Argument) > RSIStatus.InvalidIP)
+			{
+				Console.WriteLine("Cannot create directories remotely");
+                return;
+			}
 
-            Util.WriteColor($"{Source.Attributes["Name"].Value, -40} -> {Destination.GetPath()} ", ConsoleColor.Yellow);
+            bool NameConflict = Player.CurrentSession.PathNode.GetNodeFromPath(Argument) != null;
 
-            XmlNode ToCopy = Source.Clone();
-            Destination.AppendChild(ToCopy);
+            if (NameConflict)
+			{
+				Console.WriteLine("An object with that name already exists");
+                return;
+			}
 
-            Util.BeginSpinningCursorAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 25, 150, 20, Console.GetCursorPosition());
-            Util.WriteLineColor("√", ConsoleColor.Green);
+            // We're all good at this point, create the directory
 
-            Console.CursorVisible = true;
-        }
+            if (Argument.Contains('/'))
+			{
+				Console.WriteLine("Name cannot contain slashes");
+				Console.WriteLine("To create in a directory besides the CWD, specify the [p] or [path] named parameter with the directory you wish to create in");
+				Console.WriteLine();
+				Console.WriteLine("(that last bit is not implemented yet, sorry)");
+                return;
+			}
 
-        public static (bool, dynamic) HandleOtherSCPArg(string Argument)
-		{
-            // first we're going to determine the type of query
-            RSIStatus QueryRSIStatus = NodeLocator.GetRSIStatus(Argument);
+            XmlNode NewDirectory = Player.CurrentSession.PathNode.OwnerDocument.CreateElement("Directory");
 
-            dynamic Source;
+            XmlAttribute NewDirectoryAttribute = Player.CurrentSession.PathNode.OwnerDocument.CreateAttribute("Name");
+            NewDirectoryAttribute.InnerText = Argument;
 
-            switch (QueryRSIStatus)
-            {
-                case RSIStatus.None:
-                    // local query, use LocalLocate
-                    Source = NodeLocator.LocalLocate(Argument, in Player.ConnectionInfo);
-                    break;
+            NewDirectory.Attributes.Append(NewDirectoryAttribute);
 
-                case RSIStatus.Complete:
-                    // remote query, use RemoteLocate with new ConnectionInfo
-                    string RSI = Argument.Split(':')[0];
-                    string[] RSIElements = RSI.Split('@');
+            Player.CurrentSession.PathNode.AppendChild(NewDirectory);
+		}
+	}
 
-                    Computer PC = Computers.GetComputer(RSIElements[1]);
+    public static void List(InputQuery Query)
+    {
+        XmlNode NodeToList = Player.CurrentSession.PathNode;
 
-                    if (!ConnectedPCs.Contains(PC)) // If we do not already have an active session on this computer, create one.
-                    {
-                        ConnectedPCs.Add(PC);
-						Console.WriteLine($"Connected to {PC.Name}@{PC.Address}");
-                    }
+        if (Query.Arguments.Count > 0)
+        {
+            if (Remote.GetRSIStatus(Query.Arguments[0]) > RSIStatus.InvalidIP)
+			{
+				Console.WriteLine("Cannot list the contents of a remote directory");
+                return;
+			}
 
-                    UserAccount Account = PC.GetUser(RSIElements[0]);
-
-                    if (!LoggedInAccounts.Contains(Account))    // If we are not already logged in to this particular account, log in.
-					{
-                        if (Account.Password.Length > 0)
-                        {
-                            string Password = String.Empty;
-
-                            do
-                            {
-                                Console.WriteLine($"Password for '{Account.Username}': ");
-                                Password = Util.ReadLineSecret();
-
-                                if (Password == "$cancel")
-                                    return (false, null);
-                            }
-                            while (Password != Account.Password);
-
-                            LoggedInAccounts.Add(Account);
-                        }
-                    }
-
-                    ConnectionInfo New = new() { PC = Computers.GetComputer(RSIElements[1]), User = Account };
-                    Source = NodeLocator.RemoteLocate(Argument, in New);
-                    break;
-
-                default:
-                    Console.WriteLine($"Error in query '{QueryRSIStatus}'");
-                    return (false, null);
-            }
-
-            switch (Source)
-            {
+            switch (FSAPI.Locate(Player.CurrentSession, Query.Arguments[0]))
+			{
                 case XmlNode n:
-                    return (true, n);
+                    NodeToList = n;
+                    break;
 
                 case XmlNodeList nl:
-                    return (true, nl);
-
-                default:
-                    Console.WriteLine($"Unable to resolve source query '{Argument}'");
-                    return (false, null);
-            }
-        }
-
-        public static void MakeDirectory(InputQuery Query)
-		{
-            if (Query.Arguments.Count == 0)
-			{
-				Console.WriteLine("Insufficient arguments");
-                return;
-			}
-
-            foreach (string Argument in Query.Arguments)
-			{
-                if (NodeLocator.GetRSIStatus(Argument) > RSIStatus.None)
-				{
-					Console.WriteLine("Cannot create directories remotely");
-                    return;
-				}
-
-                bool NameConflict = Player.ConnectionInfo.PathNode.GetNodeFromPath(Argument) != null;
-
-                if (NameConflict)
-				{
-					Console.WriteLine("An object with that name already exists");
-                    return;
-				}
-
-                // We're all good at this point, create the directory
-
-                if (Argument.Contains('/'))
-				{
-					Console.WriteLine("Name cannot contain slashes");
-					Console.WriteLine("To create in a directory besides the CWD, specify the [p] or [path] named parameter with the directory you wish to create in");
-					Console.WriteLine();
-					Console.WriteLine("(that last bit is not implemented yet, sorry)");
-                    return;
-				}
-
-                XmlNode NewDirectory = Player.ConnectionInfo.PathNode.OwnerDocument.CreateElement("Directory");
-
-                XmlAttribute NewDirectoryAttribute = Player.ConnectionInfo.PathNode.OwnerDocument.CreateAttribute("Name");
-                NewDirectoryAttribute.InnerText = Argument;
-
-                NewDirectory.Attributes.Append(NewDirectoryAttribute);
-
-                Player.ConnectionInfo.PathNode.AppendChild(NewDirectory);
-			}
-		}
-
-        public static void List(InputQuery Query)
-        {
-            XmlNode NodeToList = Player.ConnectionInfo.PathNode;
-
-            if (Query.Arguments.Count > 0)
-            {
-                RSIStatus ArgRSIStatus = NodeLocator.GetRSIStatus(Query.Arguments[0]);
-
-                if (ArgRSIStatus > RSIStatus.None)
-				{
-					Console.WriteLine("Cannot list the contents of a remote directory");
-                    return;
-				}
-
-                switch (NodeLocator.LocalLocate(Query.Arguments[0], in Player.ConnectionInfo))
-				{
-                    case XmlNode n:
-                        NodeToList = n;
-                        break;
-
-                    case XmlNodeList nl:
-                        NodeToList = nl[0];
-                        break;
-
-                    default:
-						Console.WriteLine($"Could not resolve query: '{Query.Arguments[0]}'");
-                        break;
-				}
-            }
-
-			if (NodeToList.Name == "File")
-			{
-				Console.WriteLine($"Listing details for file '{NodeToList.Attributes["Name"].Value}'");
-				Console.WriteLine();
-
-				Console.Write("Path".PadRight(10));
-                Util.WriteLineColor(NodeToList.GetPath(), ConsoleColor.Yellow);
-
-				Console.Write("Length".PadRight(10));
-
-                int Length = NodeToList.InnerText.Trim().Length;
-                Util.WriteLineColor(Length.ToString() + (Length == 1 ? " character" : " characters"), ConsoleColor.Yellow);
-
-                return;
-			}
-
-            Console.WriteLine($"Listing for '{NodeToList.GetPath()}'");
-            Console.WriteLine();
-
-            XmlNodeList Folders = NodeToList.SelectNodes("Directory");
-            XmlNodeList Files = NodeToList.SelectNodes("File");
-            
-            if (Folders != null) {
-
-                foreach (XmlNode Folder in Folders)
-                    Util.WriteLineColor(Folder.Attributes["Name"].Value, ConsoleColor.Yellow);
-			}
-
-            if (Files != null) {
-
-                foreach (XmlNode File in Files)
-                    if (File.Attributes["Command"] is not null)
-                        Util.WriteLineColor(File.Attributes["Name"].Value, ConsoleColor.Green);
-                    else
-                        Console.WriteLine(File.Attributes["Name"].Value);
-            }
-        }
-
-        public static void CD(InputQuery Query)
-        {
-            // Handle no arguments
-            if (Query.Arguments.Count == 0)
-            {
-				Console.WriteLine("Insufficient parameters");
-                return;
-			}
-
-            // Handle remote queries
-            if (NodeLocator.GetRSIStatus(Query.Arguments[0]) > RSIStatus.None)
-			{
-				Console.WriteLine("Cannot CD into a remote directory");
-                return;
-			}
-
-            // Handle query
-            switch (NodeLocator.LocalLocate(Query.Arguments[0], in Player.ConnectionInfo))
-			{
-                case XmlNode n:
-                    if (n.Name == "File")
-					{
-						Console.WriteLine("Cannot CD into a file");
-                        return;
-					}
-                    Player.ConnectionInfo.PathNode = n;
-                    return;
-
-                case XmlNodeList:
-                    Console.WriteLine("Query must resolve to a single directory");
-                    return;
-
-                default:
-					Console.WriteLine($"Directory '{Query.Arguments[0]}' not found");
-                    return;
-			}
-		}
-
-        public static void Move(InputQuery Query)
-		{
-            if (Query.Arguments.Count < 2)
-			{
-				Console.WriteLine("Insufficient parameters");
-                return;
-			}
-
-            // Test for Remote System Identifiers (RSIs) on both the origin and destination queries
-            RSIStatus OriginRSIStatus = NodeLocator.GetRSIStatus(Query.Arguments[0]);
-            RSIStatus DestinationRSIStatus = NodeLocator.GetRSIStatus(Query.Arguments[1]);
-
-            // Handle remote queries
-            if (OriginRSIStatus > RSIStatus.None || DestinationRSIStatus > RSIStatus.None)
-			{
-				Console.WriteLine("Move does not support remote queries");
-                return;
-			}
-
-            // Find each query
-            dynamic Origin = NodeLocator.LocalLocate(Query.Arguments[0], in Player.ConnectionInfo);
-            dynamic Destination = NodeLocator.LocalLocate(Query.Arguments[1], in Player.ConnectionInfo);
-
-            switch (Destination)
-			{
-                case XmlNode d:
-                    if (d.Name == "File")
-					{
-						Console.WriteLine("Destination must be a directory");
-                        return;
-					}
-                    switch (Origin)
-					{
-                        case XmlNode o:
-
-                            d.AppendChild(o);
-
-                            //if (o == Player.ConnectionInfo.PathNode)
-                            //    Player.ConnectionInfo.PathNode = d;
-
-                            break;
-
-                        case XmlNodeList nl:
-                            int count = nl.Count;
-
-                            for (int i = 0; i < count; i++)
-                            {
-                                //if (nl[i] == Player.ConnectionInfo.PathNode) // An origin query involving multiple items may include the current directory so we must check for that
-                                //    Player.ConnectionInfo.PathNode = d;
-
-                                d.AppendChild(nl[0]);
-                            }
-                            break;
-
-                        default:
-							Console.WriteLine($"Could resolve origin query '{Query.Arguments[0]}', nothing was moved");
-                            return;
-					}
+                    NodeToList = nl[0];
                     break;
 
-                case XmlNodeList:
-					Console.WriteLine("Cannot have more than one destination");
-                    return;
-
                 default:
-					Console.WriteLine($"Could not resolve destination query '{Query.Arguments[1]}', nothing was moved");
-                    return;
+					Console.WriteLine($"Could not resolve query: '{Query.Arguments[0]}'");
+                    break;
 			}
-		}
+        }
 
-		public static XmlNode LocateNode(string Query)
+		if (NodeToList.Name == "File")
 		{
-			if (Query.Length == 0) { return null; }
-
-            if (Query[0] == '/')
-                return Player.ConnectionInfo.PC.GetNodeFromPath(Query);
-            else
-                return Player.ConnectionInfo.PathNode.GetNodeFromPath(Query);
-		}
-
-        public static void Remove(InputQuery Query)
-		{
-            if (Query.Arguments.Count == 0)
-			{
-				Console.WriteLine("Insufficient parameters");
-                return;
-			}
-
-            if (NodeLocator.GetRSIStatus(Query.Arguments[0]) > RSIStatus.None)
-			{
-                Console.WriteLine("Remove does not support remote queries");
+            if (!FSAPI.UserHasPermissions(Player.CurrentSession, NodeToList, PermissionType.Read))
+            {
+                Console.WriteLine($"'{Player.CurrentSession.User.Username}' is not permitted to perform that action");
                 return;
             }
 
-            XmlNode Node = Player.ConnectionInfo.PathNode;
+            Console.WriteLine($"Listing details for file '{NodeToList.Attributes["Name"].Value}'");
+			Console.WriteLine();
 
-            switch (NodeLocator.LocalLocate(Query.Arguments[0], in Player.ConnectionInfo))
-            {
-                case XmlNode n:
-                    if (n.Name == "Root")
+			Console.Write("Path".PadRight(10));
+            Util.WriteLineColor(NodeToList.GetPath(), ConsoleColor.Yellow);
+
+			Console.Write("Length".PadRight(10));
+
+            int Length = NodeToList.InnerText.Trim().Length;
+            Util.WriteLineColor(Length.ToString() + (Length == 1 ? " character" : " characters"), ConsoleColor.Yellow);
+
+            return;
+		}
+
+        if ( !FSAPI.UserHasPermissions(Player.CurrentSession, NodeToList, PermissionType.Read, PermissionType.Execute) )
+        {
+            Console.WriteLine($"'{Player.CurrentSession.User.Username}' is not permitted to perform that action");
+            return;
+        }
+
+        Console.WriteLine($"Listing for '{NodeToList.GetPath()}'");
+        Console.WriteLine();
+
+        XmlNodeList Folders = NodeToList.SelectNodes("Directory");
+        XmlNodeList Files = NodeToList.SelectNodes("File");
+            
+        if (Folders != null) {
+
+            foreach (XmlNode Folder in Folders)
+                Util.WriteLineColor(Folder.Attributes["Name"].Value, ConsoleColor.Yellow);
+		}
+
+        if (Files != null) {
+
+            foreach (XmlNode File in Files)
+                if (File.Attributes["Command"] is not null)
+                    Util.WriteLineColor(File.Attributes["Name"].Value, ConsoleColor.Green);
+                else
+                    Console.WriteLine(File.Attributes["Name"].Value);
+        }
+    }
+
+    public static void CD(InputQuery Query)
+    {
+        // Handle no arguments
+        if (Query.Arguments.Count == 0)
+        {
+			Console.WriteLine("Insufficient parameters");
+            return;
+		}
+
+        // Handle remote queries
+        if (Remote.GetRSIStatus(Query.Arguments[0]) > RSIStatus.InvalidIP)
+		{
+			Console.WriteLine("Cannot CD into a remote directory");
+            return;
+		}
+
+        // Handle query
+        if (!FSAPI.TryGetNode(Player.CurrentSession, Query.Arguments[0], FSNodeType.Directory, out XmlNode TryDirectory))
+		{
+            Console.WriteLine($"Directory '{Query.Arguments[0]}' not found");
+            return;
+        }
+
+        if (!FSAPI.UserHasPermissions(Player.CurrentSession, TryDirectory, PermissionType.Execute))
+		{
+            Console.WriteLine($"'{Player.CurrentSession.User.Username}' is not permitted to perform that action");
+            return;
+        }
+
+        Player.CurrentSession.PathNode = TryDirectory;
+	}
+
+    public static void Move(InputQuery Query)
+	{
+        if (Query.Arguments.Count < 2)
+		{
+			Console.WriteLine("Insufficient parameters");
+            return;
+		}
+
+        // Test for Remote System Identifiers (RSIs) on both the origin and destination queries
+        if (Remote.GetRSIStatus(Query.Arguments[0]) > RSIStatus.InvalidIP || Remote.GetRSIStatus(Query.Arguments[1]) > RSIStatus.InvalidIP)
+		{
+			Console.WriteLine("Move does not support remote queries");
+            return;
+		}
+
+        // Find each query
+
+        if (!FSAPI.TryGetNode(Player.CurrentSession, Query.Arguments[0], out dynamic Origin))
+		{
+			Console.WriteLine($"Could not resolve origin query '{Query.Arguments[0]}'");
+            return;
+		}
+
+        if (!FSAPI.TryGetNode(Player.CurrentSession, Query.Arguments[1], FSNodeType.Directory, out XmlNode Destination))
+		{
+            Console.WriteLine($"Directory '{Query.Arguments[1]}' not found");
+            return;
+        }
+
+        switch (Origin)
+		{
+            case XmlNode o:
+                Destination.AppendChild(o);
+                break;
+
+            case XmlNodeList nl:
+                int count = nl.Count;
+
+                for (int i = 0; i < count; i++)
+                {
+                    //if (nl[i] == Player.CurrentShell.PathNode) // An origin query involving multiple items may include the current directory so we must check for that
+                    //    Player.CurrentShell.PathNode = d;
+
+                    Destination.AppendChild(nl[0]);
+                }
+                break;
+		}
+	}
+
+	public static XmlNode LocateNode(string Query)
+	{
+		if (Query.Length == 0) { return null; }
+
+        if (Query[0] == '/')
+            return Player.CurrentSession.Host.GetNodeFromPath(Query);
+        else
+            return Player.CurrentSession.PathNode.GetNodeFromPath(Query);
+	}
+
+    public static void Remove(InputQuery Query)
+	{
+        if (Query.Arguments.Count == 0)
+		{
+			Console.WriteLine("Insufficient parameters");
+            return;
+		}
+
+        if (Remote.GetRSIStatus(Query.Arguments[0]) > RSIStatus.InvalidIP)
+		{
+            Console.WriteLine("Remove does not support remote queries");
+            return;
+        }
+
+        XmlNode Traverser = Player.CurrentSession.PathNode;
+
+        switch (FSAPI.Locate(Player.CurrentSession, Query.Arguments[0]))
+        {
+            case XmlNode n:
+                if (n.Name == "Root")
+                {
+                    Console.WriteLine("Cannot delete the root directory");
+                    return;
+                }
+
+                while (Traverser.Name != "Root")
+                {
+                    if (Traverser == n)
                     {
-                        Console.WriteLine("Cannot delete root directory");
+                        // error condition
+                        Console.WriteLine("Cannot delete a parent of the current working directory");
                         return;
                     }
+                    Traverser = Traverser.ParentNode;
+                }
 
-                    while (Node.Name != "Root")
-                    {
-                        if (Node == n)
+                n.ParentNode.RemoveChild(n);
+                break;
+
+            case XmlNodeList nl:
+                XmlNode Parent = nl[0].ParentNode;
+
+                while (Traverser.Name != "Root")
+                {
+                    foreach (XmlNode n in nl)
+                        if (Traverser == n)
                         {
-                            // error condition
                             Console.WriteLine("Cannot delete a parent of the current working directory");
                             return;
                         }
-                        Node = Node.ParentNode;
-                    }
 
-                    n.ParentNode.RemoveChild(n);
-                    break;
+                    Traverser = Traverser.ParentNode;
+                }
 
-                case XmlNodeList nl:
-                    XmlNode Parent = nl[0].ParentNode;
+                for (int i = nl.Count - 1; i >= 0; i--)
+                    Parent.RemoveChild(nl[i]);
 
-                    while (Node.Name != "Root")
-                    {
-                        foreach (XmlNode n in nl)
-                            if (Node == n)
-                            {
-                                Console.WriteLine("Cannot delete a parent of the current working directory");
-                                return;
-                            }
+                break;
 
-                        Node = Node.ParentNode;
-                    }
+            default:
+                Console.WriteLine($"Could not resolve query '{Query.Arguments[0]}'");
+                break;
+        }
+	}
 
-                    for (int i = nl.Count - 1; i >= 0; i--)
-                        Parent.RemoveChild(nl[i]);
-
-                    break;
-
-                default:
-                    Console.WriteLine($"Could not resolve query '{Query.Arguments[0]}'");
-                    break;
-            }
+    public static void Concatenate(InputQuery Query)
+    {
+        if (Query.Arguments.Count == 0)
+		{
+			Console.WriteLine("Insufficient parameters");
+            return;
 		}
 
-        public static void Concatenate(InputQuery Query)
-        {
-            if (Query.Arguments.Count == 0)
-			{
-				Console.WriteLine("Insufficient parameters");
-                return;
-			}
-
-            if (NodeLocator.GetRSIStatus(Query.Arguments[0]) > RSIStatus.None)
-			{
-                Console.WriteLine("Concatenate does not support remote queries");
-                return;
-            }
-
-            switch (NodeLocator.LocalLocate(Query.Arguments[0], in Player.ConnectionInfo))
-            {
-                case XmlNode n:
-                    if (n.Name != "File")
-                    {
-                        Console.WriteLine("Query must resolve to a file");
-                        return;
-                    }
-                    Console.WriteLine(n.InnerText.Trim());
-                    Events.FireReadFile(Player, Computers, Query, Events, n);
-                    break;
-
-                case XmlNodeList:
-                    Console.WriteLine("Cannot read more than one file at a time");
-                    break;
-
-                default:
-                    Console.WriteLine($"Could not find file '{Query.Arguments[0]}'");
-                    break;
-            }
+        if (Remote.GetRSIStatus(Query.Arguments[0]) > RSIStatus.InvalidIP)
+		{
+            Console.WriteLine("Concatenate does not support remote queries");
+            return;
         }
 
-        public static void Sus() {
-            Console.WriteLine($".   ....../#########((#(*,. ,...,,,,,......,..........,**((((/#(/////////////////");
-            Console.WriteLine($"........../(######(/*,,.,......,.......................,,***/(#(#(///////////////");
-            Console.WriteLine($"          ,(###(//,,,,...,*.............,,....,,,.....,,.,*///((((///////////////");
-            Console.WriteLine($"           *,,,,,,..  . .,*,...,,,,*,*****///(///////*****,,,*,,,*///////////////");
-            Console.WriteLine($"          .,,,....   ...,,,,,,,*////((((####%%%%%%######(((/*,,,....,**//////////");
-            Console.WriteLine($".....  ...,,,.... ...,,,****,,/((((((####%%%%%%%%%%%%%####((((**,,...,/*/////////");
-            Console.WriteLine($" .....,*,,,,..   .,,*******/,*(((((########%%%%%&%%%##########(/**,......////////");
-            Console.WriteLine($",.***/,,*,,..   ,,****/*****,/((((((#####%%%%%&&&&%%%##########(/*,,.....,///////");
-            Console.WriteLine($"*,****//...   .,**///*****,*((((((((#######%%%%%%%%%##########(((/*,,.....,//////");
-            Console.WriteLine($"%%%%#(/*,..  ,,************((((############%%%%%&&%%%%%########((/**,....,*///(//");
-            Console.WriteLine($"%%%%%%,,,....,**********/(((((((((##(#######%#%%%%%%%%%########(((**,.....*/////(");
-            Console.WriteLine($"%%%%%%.,. ...*******//(((((((((((((((((##########%&&%%%#########((*,,.....*(/((/(");
-            Console.WriteLine($"%%%%%%*.. ...********/(((((((((((((((((((##((#(#################((/*,.....//(((((");
-            Console.WriteLine($"%%%%%%%*....,****,,,,,,,,**///////((((((((((((///*,,,,*,*,***//(##(/,,....(((((((");
-            Console.WriteLine($"%%%%%%%#,..,*,.,,*//**,.,,,,,*****/////((////***,,.,,..,********/(((*,..  (((((((");
-            Console.WriteLine($"%%%%%%%&. .,,,**/*,.  ..,....,,,*,***(((((/*/**,...***/#/....,*/(&%#(....,(((((((");
-            Console.WriteLine($"%%%%%%%&,. ,,***,..,,**,   .*,..,,**/(#%%#(/*,,,,,*,.,,,*/***,/((//##,.///((((/((");
-            Console.WriteLine($"%%%%%%#%*,.*//****,,,,*... .....,,,((((#%%(/.,..,,,,*,*/(#(/(##%%%###,,/(/(/(((((");
-            Console.WriteLine($"%%%%%%%#*..*/***,,,,,****,,,,,,,,,,/(###%##(((/**,,*,,,**/(#(#((*/(((*,//((((((((");
-            Console.WriteLine($"%%%%%%%%*..********,,,,,,,,*//**,,,*(##%%#((((((((((/////((######*/((*.*/(#((((((");
-            Console.WriteLine($"%%%%%%%#,..*****///((((((((///******/(###((((((((((((////(((((#####/*///###(((/((");
-            Console.WriteLine($"%%%%%%%#...,***///(((((((//********//(#%#(((/((((/////(((##(((((###((*##%%#(((/((");
-            Console.WriteLine($"%%%%%%%**,.****////////*****,*****//((((#((((((((((((**,,**///////(/((###%%((((((");
-            Console.WriteLine($"%%%%%%%%(,.******/**,,,,**,*******//(((((#(((((((((((///*,,,,**/##*(/(((((//(((((");
-            Console.WriteLine($"%%%%%%%%%#.*******.,,,,,,****,*****/(#(((//**///(((((////*,,,,.,/(/*/(((///(/((((");
-            Console.WriteLine($"%%%%%%%%%%%(*****.,,..,,,*****,,,,,,,******////(((//***,,...,, ,*/*//(((//(//((((");
-            Console.WriteLine($"%%%%%%%%%%%%/***/,/***. ...*****,,,,,,,,*((///****,,,**...,*,,.///*/*/*///////(((");
-            Console.WriteLine($"%%%%%%%%%%%(%****/*/****.. ,*****,************((#%(####.,(///,/*(,/*/////////*(((");
-            Console.WriteLine($"%%%%%%##%%#,#(****/*(/***,.(%#%#%&/(##(/(&@##&@#&&%&&*,/(////,//*//(((////////(((");
-            Console.WriteLine($"###%%%##%##.#%%/***/**/**,,. #%%&&%&&&&(&&@@&&&&&&%..*/((((//(/**/(((///*/////((/");
-            Console.WriteLine($"###########*/%%%%/**//*/***,,...,/*%%%%%%&&%%,//,/#***/((((/((//(/////*/*.       ");
-            Console.WriteLine($"###########(,%%###(*,*/*/**,,,,../*.,,,,,,,,,,#(&%//*/(##((((*/*/////*/**.    ...");
-            Console.WriteLine($"###########%,######((**/******,,*/*,/((#(###((((////(((##((/***/*//**//*,.     ..");
-            Console.WriteLine($"############((#(,,**,,,,//****//*,,**/////(//(////((((####(/(((%*#%%(((*..      .");
-            Console.WriteLine($"########(/*,**///***./,,,*********/////(((((((((((((((###(///((((.*((#%%%* . ....");
-            Console.WriteLine($"((*,,**,****,**///, ***,,,,*****/*///////(/((/(((((#(#(#(*///((((/.#####((##%%%%(");
-            Console.WriteLine($"/*,*,,,,***,**///* ****,,,,,***/**/////(((/((((###((#(#*,,**/((((/,######%%%%#((#");
-            Console.WriteLine($"**,,,,***,***********,,,*,,,,,,//////(/((((((((#((#((,*//((*,,(((**##############");
-            Console.WriteLine($"*,,,,****/****/*/*.,,,,,**,**,,,/*///(((((((((((((((,*////((/,,,((###############");
-            Console.WriteLine($"**,,****//*,,,****. *,,,,*****,,,,**///(/(///////,,**/////((((((*#(((############");
+        if (!FSAPI.TryGetNode(Player.CurrentSession, Query.Arguments[0], FSNodeType.File, out XmlNode File))
+		{
+            Console.WriteLine($"Could not find file '{Query.Arguments[0]}'");
+            return;
         }
+
+        Console.WriteLine(File.InnerText.Trim());
+        Events.FireReadFile(Player, Computers, Query, Events, File);
+    }
+
+    public static void Sus() {
+        Console.WriteLine($".   ....../#########((#(*,. ,...,,,,,......,..........,**((((/#(/////////////////");
+        Console.WriteLine($"........../(######(/*,,.,......,.......................,,***/(#(#(///////////////");
+        Console.WriteLine($"          ,(###(//,,,,...,*.............,,....,,,.....,,.,*///((((///////////////");
+        Console.WriteLine($"           *,,,,,,..  . .,*,...,,,,*,*****///(///////*****,,,*,,,*///////////////");
+        Console.WriteLine($"          .,,,....   ...,,,,,,,*////((((####%%%%%%######(((/*,,,....,**//////////");
+        Console.WriteLine($".....  ...,,,.... ...,,,****,,/((((((####%%%%%%%%%%%%%####((((**,,...,/*/////////");
+        Console.WriteLine($" .....,*,,,,..   .,,*******/,*(((((########%%%%%&%%%##########(/**,......////////");
+        Console.WriteLine($",.***/,,*,,..   ,,****/*****,/((((((#####%%%%%&&&&%%%##########(/*,,.....,///////");
+        Console.WriteLine($"*,****//...   .,**///*****,*((((((((#######%%%%%%%%%##########(((/*,,.....,//////");
+        Console.WriteLine($"%%%%#(/*,..  ,,************((((############%%%%%&&%%%%%########((/**,....,*///(//");
+        Console.WriteLine($"%%%%%%,,,....,**********/(((((((((##(#######%#%%%%%%%%%########(((**,.....*/////(");
+        Console.WriteLine($"%%%%%%.,. ...*******//(((((((((((((((((##########%&&%%%#########((*,,.....*(/((/(");
+        Console.WriteLine($"%%%%%%*.. ...********/(((((((((((((((((((##((#(#################((/*,.....//(((((");
+        Console.WriteLine($"%%%%%%%*....,****,,,,,,,,**///////((((((((((((///*,,,,*,*,***//(##(/,,....(((((((");
+        Console.WriteLine($"%%%%%%%#,..,*,.,,*//**,.,,,,,*****/////((////***,,.,,..,********/(((*,..  (((((((");
+        Console.WriteLine($"%%%%%%%&. .,,,**/*,.  ..,....,,,*,***(((((/*/**,...***/#/....,*/(&%#(....,(((((((");
+        Console.WriteLine($"%%%%%%%&,. ,,***,..,,**,   .*,..,,**/(#%%#(/*,,,,,*,.,,,*/***,/((//##,.///((((/((");
+        Console.WriteLine($"%%%%%%#%*,.*//****,,,,*... .....,,,((((#%%(/.,..,,,,*,*/(#(/(##%%%###,,/(/(/(((((");
+        Console.WriteLine($"%%%%%%%#*..*/***,,,,,****,,,,,,,,,,/(###%##(((/**,,*,,,**/(#(#((*/(((*,//((((((((");
+        Console.WriteLine($"%%%%%%%%*..********,,,,,,,,*//**,,,*(##%%#((((((((((/////((######*/((*.*/(#((((((");
+        Console.WriteLine($"%%%%%%%#,..*****///((((((((///******/(###((((((((((((////(((((#####/*///###(((/((");
+        Console.WriteLine($"%%%%%%%#...,***///(((((((//********//(#%#(((/((((/////(((##(((((###((*##%%#(((/((");
+        Console.WriteLine($"%%%%%%%**,.****////////*****,*****//((((#((((((((((((**,,**///////(/((###%%((((((");
+        Console.WriteLine($"%%%%%%%%(,.******/**,,,,**,*******//(((((#(((((((((((///*,,,,**/##*(/(((((//(((((");
+        Console.WriteLine($"%%%%%%%%%#.*******.,,,,,,****,*****/(#(((//**///(((((////*,,,,.,/(/*/(((///(/((((");
+        Console.WriteLine($"%%%%%%%%%%%(*****.,,..,,,*****,,,,,,,******////(((//***,,...,, ,*/*//(((//(//((((");
+        Console.WriteLine($"%%%%%%%%%%%%/***/,/***. ...*****,,,,,,,,*((///****,,,**...,*,,.///*/*/*///////(((");
+        Console.WriteLine($"%%%%%%%%%%%(%****/*/****.. ,*****,************((#%(####.,(///,/*(,/*/////////*(((");
+        Console.WriteLine($"%%%%%%##%%#,#(****/*(/***,.(%#%#%&/(##(/(&@##&@#&&%&&*,/(////,//*//(((////////(((");
+        Console.WriteLine($"###%%%##%##.#%%/***/**/**,,. #%%&&%&&&&(&&@@&&&&&&%..*/((((//(/**/(((///*/////((/");
+        Console.WriteLine($"###########*/%%%%/**//*/***,,...,/*%%%%%%&&%%,//,/#***/((((/((//(/////*/*.       ");
+        Console.WriteLine($"###########(,%%###(*,*/*/**,,,,../*.,,,,,,,,,,#(&%//*/(##((((*/*/////*/**.    ...");
+        Console.WriteLine($"###########%,######((**/******,,*/*,/((#(###((((////(((##((/***/*//**//*,.     ..");
+        Console.WriteLine($"############((#(,,**,,,,//****//*,,**/////(//(////((((####(/(((%*#%%(((*..      .");
+        Console.WriteLine($"########(/*,**///***./,,,*********/////(((((((((((((((###(///((((.*((#%%%* . ....");
+        Console.WriteLine($"((*,,**,****,**///, ***,,,,*****/*///////(/((/(((((#(#(#(*///((((/.#####((##%%%%(");
+        Console.WriteLine($"/*,*,,,,***,**///* ****,,,,,***/**/////(((/((((###((#(#*,,**/((((/,######%%%%#((#");
+        Console.WriteLine($"**,,,,***,***********,,,*,,,,,,//////(/((((((((#((#((,*//((*,,(((**##############");
+        Console.WriteLine($"*,,,,****/****/*/*.,,,,,**,**,,,/*///(((((((((((((((,*////((/,,,((###############");
+        Console.WriteLine($"**,,****//*,,,****. *,,,,*****,,,,**///(/(///////,,**/////((((((*#(((############");
     }
 }

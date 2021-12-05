@@ -1,11 +1,11 @@
-﻿<Root>
-	<Directory Name="home">
-		<File Name="test.txt">
+﻿<Root Perms="root:77">
+	<Directory Name="home" Perms="root:64">
+		<File Name="test.txt" Perms="root:77">
 This is a test document
 		</File>
-		<Directory Name="jason">
-			<Directory Name="Documents">
-				<File Name="reminder.txt">
+		<Directory Name="jason" Perms="jason:60">
+			<Directory Name="Documents" Perms="jason:64">
+				<File Name="reminder.txt" Perms="jason:77">
 1. Apply for a job
 2. Study for US History test
 3. Investigate hacker forum
@@ -17,25 +17,25 @@ This is a test document
 			</Directory> 
 		</Directory>
 	</Directory>
-	<Directory Name="sys">
-		<File Name="kguilib.sys"/>
-		<File Name="netman.sys"/>
-		<File Name="kcmk.sys"/>
-		<File Name="sfs.sys"/>
+	<Directory Name="sys" Perms="root:64">
+		<File Name="kguilib.sys" Perms="root:70"/>
+		<File Name="netman.sys" Perms="root:70"/>
+		<File Name="kcmk.sys" Perms="root:70"/>
+		<File Name="sfs.sys" Perms="root:70"/>
 	</Directory>
-	<Directory Name="bin">
-		<File Name="ssh" Command="ssh"/>
-		<File Name="su" Command="su"/>
-		<File Name="ls" Command="ls"/>
-		<File Name="cd" Command="cd"/>
-		<File Name="mv" Command="mv"/>
-		<File Name="rm" Command="rm"/>
-		<File Name="cr" Command="cr"/>
-		<File Name="cat" Command="cat"/>
-		<File Name="sus" Command="sus"/>
-		<File Name="clear" Command="clear"/>
-		<File Name="dc" Command="dc"/>
-		<File Name="pwd" Command="pwd"/>
-		<File Name="scp" Command="scp"/>
+	<Directory Name="bin" Perms="root:64">
+		<File Name="ssh" Command="ssh" Perms="root:75"/>
+		<File Name="su" Command="su" Perms="root:75"/>
+		<File Name="ls" Command="ls" Perms="root:75"/>
+		<File Name="cd" Command="cd" Perms="root:75"/>
+		<File Name="mv" Command="mv" Perms="root:75"/>
+		<File Name="rm" Command="rm" Perms="root:75"/>
+		<File Name="cat" Command="cat" Perms="root:75"/>
+		<File Name="sus" Command="sus" Perms="root:75"/>
+		<File Name="clear" Command="clear" Perms="root:75"/>
+		<File Name="dc" Command="dc" Perms="root:75"/>
+		<File Name="pwd" Command="pwd" Perms="root:75"/>
+		<File Name="scp" Command="scp" Perms="root:75"/>
+		<File Name="mkdir" Command="mkdir" Perms="root:75"/>
 	</Directory>
 </Root>
