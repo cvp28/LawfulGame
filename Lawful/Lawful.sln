@@ -11,6 +11,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lawful.InputParser", "..\La
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Intro", "..\Missions\Intro\Intro.csproj", "{3580A7C8-3484-4E2B-90CE-D309275A0B3A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShouldersOfGiants", "..\Missions\ShouldersOfGiants\ShouldersOfGiants.csproj", "{623C87A9-810E-454F-9E0B-8912850C0978}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Missions", "Missions", "{79C83B27-E49F-47C2-AA0A-47A73334CEB9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,9 +37,17 @@ Global
 		{3580A7C8-3484-4E2B-90CE-D309275A0B3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3580A7C8-3484-4E2B-90CE-D309275A0B3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3580A7C8-3484-4E2B-90CE-D309275A0B3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{623C87A9-810E-454F-9E0B-8912850C0978}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{623C87A9-810E-454F-9E0B-8912850C0978}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{623C87A9-810E-454F-9E0B-8912850C0978}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{623C87A9-810E-454F-9E0B-8912850C0978}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3580A7C8-3484-4E2B-90CE-D309275A0B3A} = {79C83B27-E49F-47C2-AA0A-47A73334CEB9}
+		{623C87A9-810E-454F-9E0B-8912850C0978} = {79C83B27-E49F-47C2-AA0A-47A73334CEB9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3BEFEA5A-3B7F-4A20-AAC9-7C62833659DF}
