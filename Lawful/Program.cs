@@ -79,9 +79,9 @@ class Program
                 Console.WriteLine();
                 Console.Write("> ");
 
-                string? UserStorySelection = Console.ReadLine();
+                string UserStorySelection = Console.ReadLine();
 
-                if (UserStorySelection?.ToUpper() == "EXIT")
+                if (UserStorySelection.ToUpper() == "EXIT")
                 {
                     CurrentState = GameState.MainMenu;
                     continue;
@@ -135,7 +135,7 @@ class Program
 
                 ConsoleColor RevertTo = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                string? Input = Console.ReadLine();
+                string Input = Console.ReadLine();
                 Console.ForegroundColor = RevertTo;
 
                 if (Input.ToUpper() == "EXIT")
@@ -182,11 +182,60 @@ class Program
 
                 Thread.Sleep(500);
 
-                Console.WriteLine("Checking for storage devices...");
+                Console.Write("Building device list... ");
+                Util.BeginCharacterAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 16, 16, 50, Console.GetCursorPosition());
+                Util.WriteLineColor("OK", ConsoleColor.Green);
                 Thread.Sleep(250);
-                Util.WriteLineColor("    Found Device! :: 0x01 :: 2TB Toshiba Drive   (Mechanical)", ConsoleColor.Green);
+
+                
+                Util.WriteLineColor("    Found Device!", ConsoleColor.Green);
+
+                Thread.Sleep(50);
+                Console.Write("        ");
+                Util.BeginCharacterAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 6, 6, 50, Console.GetCursorPosition());
+                Util.WriteLineColor("    ID                : 0x01", ConsoleColor.Yellow);
+
+                Thread.Sleep(50);
+                Console.Write("        ");
+                Util.BeginCharacterAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 6, 6, 50, Console.GetCursorPosition());
+                Util.WriteLineColor("    Type              : Mechanical", ConsoleColor.Yellow);
+
+                Thread.Sleep(50);
+                Console.Write("        ");
+                Util.BeginCharacterAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 6, 6, 50, Console.GetCursorPosition());
+                Util.WriteLineColor("    Vendor            : Toshiba", ConsoleColor.Yellow);
+
+                Thread.Sleep(50);
+                Console.Write("        ");
+                Util.BeginCharacterAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 6, 6, 50, Console.GetCursorPosition());
+                Util.WriteLineColor("    Reported Capacity : 2 TB (2,199,023,255,552 bytes)", ConsoleColor.Yellow);
+
                 Thread.Sleep(500);
-                Util.WriteLineColor("    Found Device! :: 0x02 :: 500GB Samsung Drive (Solid-state)", ConsoleColor.Green);
+			    Console.WriteLine();
+                
+
+                Util.WriteLineColor("    Found Device!", ConsoleColor.Green);
+
+                Thread.Sleep(50);
+                Console.Write("        ");
+                Util.BeginCharacterAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 6, 6, 50, Console.GetCursorPosition());
+                Util.WriteLineColor("    ID                : 0x02", ConsoleColor.Yellow);
+
+                Thread.Sleep(50);
+                Console.Write("        ");
+                Util.BeginCharacterAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 6, 6, 50, Console.GetCursorPosition());
+                Util.WriteLineColor("    Type              : SSD", ConsoleColor.Yellow);
+
+                Thread.Sleep(50);
+                Console.Write("        ");
+                Util.BeginCharacterAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 6, 6, 50, Console.GetCursorPosition());
+                Util.WriteLineColor("    Vendor            : Samsung", ConsoleColor.Yellow);
+
+                Thread.Sleep(50);
+                Console.Write("        ");
+                Util.BeginCharacterAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 6, 6, 50, Console.GetCursorPosition());
+                Util.WriteLineColor("    Reported Capacity : 500 GB (536,870,912,000 bytes)", ConsoleColor.Yellow);
+
                 Thread.Sleep(250);
                 Console.WriteLine("Done!");
                 Console.WriteLine();
@@ -254,7 +303,7 @@ class Program
 
                 Util.WriteColor("  Module reliability checking... ", ConsoleColor.Yellow);
                 Thread.Sleep(500);
-                Util.WriteLineColor(" clean, no errors", ConsoleColor.Green);
+                Util.WriteLineColor(" 0 errors", ConsoleColor.Green);
 
                 Thread.Sleep(250);
 
@@ -283,7 +332,7 @@ class Program
 
                 Console.Write("[kcon]::AllocateConsole : Allocating console... ");
 
-                Util.BeginSpinningCursorAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 16, 48, 50, Console.GetCursorPosition());
+                Util.BeginCharacterAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 16, 48, 50, Console.GetCursorPosition());
 
                 Console.CursorVisible = false;
 
@@ -429,7 +478,7 @@ class Program
                 break;
 
             case "SCP":
-                //Commands.SecureCopy(Query);
+                Commands.SecureCopy(Query);
                 break;
 
             case "CAT":
@@ -512,14 +561,19 @@ class Program
         //      The default story is "Lawful" and is included in the repo
         //      This story will release with the game and user-created stories can exist as well
 
-        Directory.SetCurrentDirectory(@"C:\Users\Carson\source\repos\LawfulGameNet6");
+        Console.ForegroundColor = ConsoleColor.White;
+        if (Verbose)
+			Console.WriteLine($"Console color is now '{Console.ForegroundColor}'");
 
+        Directory.SetCurrentDirectory(@"C:\Users\Carson\source\repos\LawfulGame");
         if (Verbose)
             Console.WriteLine($"Set current directory to '{Directory.GetCurrentDirectory()}'");
     }
 
     public static void PrintTitle(bool ShowCreatorName)
     {
+        ConsoleColor InitialForeground = Console.ForegroundColor;
+
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine(
               "     __                           ____            __" + '\n' +
@@ -533,6 +587,7 @@ class Program
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(@" \ A game by Carson Ver Planck");
         }
-        Console.ForegroundColor = ConsoleColor.White;
+
+        Console.ForegroundColor = InitialForeground;
     }
 }

@@ -10,9 +10,9 @@ public class ComputerStructure
 
 	public ComputerStructure() { Computers = new(); }
 
-	public Computer? GetComputer(string Query)
+	public Computer GetComputer(string Query)
 	{
-		if (IPAddress.TryParse(Query, out IPAddress? Address))
+		if (IPAddress.TryParse(Query, out IPAddress Address))
 			return Computers.FirstOrDefault(pc => pc.Address == Address.ToString());
 		else
 			return Computers.FirstOrDefault(pc => pc.Name == Query);
@@ -20,7 +20,7 @@ public class ComputerStructure
 
 	public bool HasComputer(string Query)
 	{
-		if (IPAddress.TryParse(Query, out IPAddress? Address))
+		if (IPAddress.TryParse(Query, out IPAddress Address))
 			return Computers.Any(pc => pc.Address == Address.ToString());
 		else
 			return Computers.Any(pc => pc.Name == Query);
@@ -33,9 +33,9 @@ public class ComputerStructure
 
 	public bool RemoveComputer(string Query)
 	{
-		Computer? PC;
+		Computer PC;
 
-		if (IPAddress.TryParse(Query, out IPAddress? Address))
+		if (IPAddress.TryParse(Query, out IPAddress Address))
 			PC = Computers.FirstOrDefault(pc => pc.Address == Address.ToString());
 		else
 			PC = Computers.FirstOrDefault(pc => pc.Name == Query);
@@ -56,7 +56,7 @@ public class ComputerStructure
 		xs.Serialize(fs, this);
 	}
 		
-	public static ComputerStructure? DeserializeFromFile(string Path)
+	public static ComputerStructure DeserializeFromFile(string Path)
 	{
 		if (!File.Exists(Path))
 			throw new Exception($"Could not find file referenced by '{Path}'");

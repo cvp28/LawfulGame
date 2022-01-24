@@ -81,7 +81,8 @@
 			// Initialize some connection-related values given the computer structure for this save
 			Player.PostDeserializationInit(Computers);
 
-			Player.HomePC.TryOpenSession(Player.ProfileName, out Player.CurrentSession);
+			// Method that creates our Home PC user session and populates the CurrentSession field
+			Player.InstantiateSession();
 
 			Events = new();
 

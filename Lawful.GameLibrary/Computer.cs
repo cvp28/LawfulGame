@@ -18,7 +18,7 @@ public class Computer
 	public List<UserAccount> Accounts;
 
 	[XmlElement("Root")]
-	public XmlNode? FileSystemRoot;
+	public XmlNode FileSystemRoot;
 
 	public Computer() { }
 
@@ -44,9 +44,9 @@ public class Computer
 		Accounts.Add(new("root", RootPassword));
 	}
 
-	public UserAccount? GetRootUser() => Accounts.FirstOrDefault(account => account.Username.ToUpper() == "ROOT");
+	public UserAccount GetRootUser() => Accounts.FirstOrDefault(account => account.Username.ToUpper() == "ROOT");
 
-	public UserAccount? GetUser(string Username) => Accounts.FirstOrDefault(user => user.Username == Username);
+	public UserAccount GetUser(string Username) => Accounts.FirstOrDefault(user => user.Username == Username);
 
 	public bool HasUser(string Username) => Accounts.Any(user => user.Username == Username);
 
@@ -63,7 +63,7 @@ public class Computer
 		if (Username.ToUpper() == "ROOT")
 			return false;
 
-		UserAccount? Account = Accounts.FirstOrDefault(user => user.Username == Username);
+		UserAccount Account = Accounts.FirstOrDefault(user => user.Username == Username);
 
 		if (Account is null) { return false; }
 
@@ -72,7 +72,7 @@ public class Computer
 		return true;
 	}
 
-	public bool TryOpenSession(string Username, out UserSession? Session)
+	public bool TryOpenSession(string Username, out UserSession Session)
 	{
 		UserAccount TryUser = GetUser(Username);
 

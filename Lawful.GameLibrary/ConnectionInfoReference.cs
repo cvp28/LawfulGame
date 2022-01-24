@@ -23,7 +23,7 @@ namespace Lawful.GameLibrary
 		[XmlAttribute("Address")]
 		public string StoredPCAddress
 		{
-			get { return PlayerReference.ConnectionInfo.PC.Address; }
+			get { return PlayerReference.CurrentSession.Host.Address; }
 			set { ReferenceAddress = value; }
 		}
 
@@ -31,7 +31,7 @@ namespace Lawful.GameLibrary
 		[XmlAttribute("Path")]
 		public string StoredPath
 		{
-			get { return PlayerReference.ConnectionInfo.Path; }
+			get { return PlayerReference.CurrentSession.PathNode.GetPath(); }
 			set { ReferencePath = value; }
 		}
 
@@ -39,7 +39,7 @@ namespace Lawful.GameLibrary
 		[XmlAttribute("User")]
 		public string StoredUsername
 		{
-			get { return PlayerReference.ConnectionInfo.User.Username; }
+			get { return PlayerReference.CurrentSession.User.Username; }
 			set { ReferenceUsername = value; }
 		}
 

@@ -20,15 +20,15 @@ public enum EventType
 
 public class EventManager
 {
-	public event Action<EventGlobalType>? ReadFile;
-	public event Action<EventGlobalType>? DeleteFile;
-	public event Action<EventGlobalType>? ChangeDirectory;
-	public event Action<EventGlobalType>? DeleteDirectory;
-	public event Action<EventGlobalType>? SSHConnect;
-	public event Action<EventGlobalType>? CommandEntered;
-	public event Action<EventGlobalType>? CommandExecuted;
-	public event Action<EventGlobalType>? BootupSequenceStarted;
-	public event Action<EventGlobalType>? BootupSequenceCompleted;
+	public event Action<EventGlobalType> ReadFile;
+	public event Action<EventGlobalType> DeleteFile;
+	public event Action<EventGlobalType> ChangeDirectory;
+	public event Action<EventGlobalType> DeleteDirectory;
+	public event Action<EventGlobalType> SSHConnect;
+	public event Action<EventGlobalType> CommandEntered;
+	public event Action<EventGlobalType> CommandExecuted;
+	public event Action<EventGlobalType> BootupSequenceStarted;
+	public event Action<EventGlobalType> BootupSequenceCompleted;
 
 	#region Event Triggers
 

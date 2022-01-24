@@ -18,7 +18,7 @@ public static class Commands
 
             if (LoginQuery.Length < 2)
 			{
-				Console.WriteLine("Insufficient parameters");
+				Console.WriteLine("Insufficient arguments");
                 return;
 			}
 
@@ -83,9 +83,9 @@ public static class Commands
 
     public static void SwitchUser(InputQuery Query)
 	{
-        if (Query.Arguments.Count < 1)
+        if (Query.Arguments.Count == 0)
 		{
-			Console.WriteLine("Insufficient parameters");
+			Console.WriteLine("Insufficient arguments");
             return;
 		}
 
@@ -116,7 +116,7 @@ public static class Commands
     {
         Console.Write("Scanning... ");
 
-        Util.BeginSpinningCursorAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 16, 48, 50, Console.GetCursorPosition());
+        Util.BeginCharacterAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 16, 48, 50, Console.GetCursorPosition());
 
         Util.WriteLineColor("done!", ConsoleColor.Green);
 		Console.WriteLine();
@@ -138,8 +138,14 @@ public static class Commands
 
     // TODO (Carson): Figure out a way to check for permissions on the origin and destination(s) via the repsective users accessing them
 
+    // 1) Check the origin to the extent where the relevant user has WRITE permissions for the parent of every node of the specified path
+    // 2) Check all destinations to the extent where users have WRITE permissions for the specified path
+
     public static void SecureCopy(InputQuery Query)
 	{
+        // No matter what, every new execution of the command will start with an empty list of active UserSessions
+        ActiveSessions.Clear();
+
         if (Query.Arguments.Count == 0)
 		{
 			Util.WriteLineColor("Insufficent arguments", ConsoleColor.Red);
@@ -172,33 +178,46 @@ public static class Commands
 
         dynamic Origin = FSAPI.Locate(Current, Path);
 
+        if (Origin is null)
+		{
+            Util.WriteLineColor($"Could not locate '{Path}'", ConsoleColor.Red);
+            return;
+        }
+        
         switch (Origin)
 		{
             case XmlNode n:
-
+                if (!FSAPI.UserHasPermissions(Current, n.ParentNode, PermissionType.Write))
+				{
+                    Util.WriteLineColor($"Insufficient permissions for '{n.GetPath()}'", ConsoleColor.Red);
+                    return;
+                }
                 break;
 
             case XmlNodeList nl:
-
+                foreach (XmlNode n in nl)
+				{
+                    if (!FSAPI.UserHasPermissions(Current, n.ParentNode, PermissionType.Write))
+                    {
+                        Util.WriteLineColor($"Insufficient permissions for '{n.GetPath()}'", ConsoleColor.Red);
+                        return;
+                    }
+                }
                 break;
-
-            default:
-                Util.WriteLineColor($"Could not locate '{Path}'", ConsoleColor.Red);
-                return;
 		}
 
-        // At this point, we have an origin but we do not know where to put it
+        // At this point, we have a valid origin but we do not know where to put it
 
         if (Query.Arguments.Count >= 2)
 		{
             XmlNode Destination;
 
-            // For every argument after the origin
+            // For every destination argument after the origin
             for (int i = 1; i < Query.Arguments.Count; i++)
 			{
                 if (Remote.TryGetRSI(Query.Arguments[i], out UserAccount RemoteDestinationUser, out Computer RemoteDestinationHost, out string RemoteDestinationPath) == RSIStatus.Complete)
 				{
-                    // If, for every session, it is true that this remote query does not remote query does not reference it, we know it is not in the list of active sessions and must be validated
+                    // If, for every session, it is true that this remote query does not reference it, we know it is not in the list of active sessions and must be validated
                     if (ActiveSessions.TrueForAll(session => session.User != RemoteDestinationUser && session.Host != RemoteDestinationHost))
                     {
                         // remote origin
@@ -217,35 +236,44 @@ public static class Commands
 
                     if (Destination is null)
 					{
-                        Util.WriteLineColor($"Could not find directory '{RemoteDestinationPath}' at {RemoteDestinationHost.Address}", ConsoleColor.Red);
+                        Util.WriteLineColor($"Could not find directory '{RemoteDestinationUser}@{RemoteDestinationHost}:{RemoteDestinationPath}'", ConsoleColor.Red);
+                        return;
+					}
+
+                    if (!FSAPI.UserHasPermissions(Current, Destination, PermissionType.Read))
+					{
+                        Util.WriteLineColor($"Insufficient permissions for '{RemoteDestinationUser}@{RemoteDestinationHost}:{RemoteDestinationPath}'", ConsoleColor.Red);
                         return;
 					}
                 }
                 else
 				{
-                    Destination = FSAPI.LocateDirectory(Player.CurrentSession, Query.Arguments[i]);
+                    Current = Player.CurrentSession;
+                    Destination = FSAPI.LocateDirectory(Current, Query.Arguments[i]);
 
                     if (Destination is null)
                     {
                         Util.WriteLineColor($"Could not find directory '{Query.Arguments[i]}'", ConsoleColor.Red);
                         return;
                     }
+
+                    if (!FSAPI.UserHasPermissions(Current, Destination, PermissionType.Write))
+					{
+                        Util.WriteLineColor($"Insufficient permissions for '{Query.Arguments[i]}'", ConsoleColor.Red);
+                        return;
+					}
                 }
                     
-                // Copy the file(s) here (check for permissions first!)
+                // Copy the file(s) here
                 switch (Origin)
 				{
                     case XmlNode n:
-                        // Check for permissions here
-
                         AnimatedFileTransfer(n, Destination);
                         break;
 
                     case XmlNodeList nl:
                         foreach (XmlNode n in nl)
-						{
-
-						}
+                            AnimatedFileTransfer(n, Destination);
                         break;
 				}
 			}
@@ -256,12 +284,12 @@ public static class Commands
     {
         Console.CursorVisible = false;
 
-        Util.WriteColor($"{Source.Attributes["Name"].Value,-40} -> {Destination.GetPath()} ", ConsoleColor.Yellow);
+        Util.WriteColor($"{(Source.Name == "Root" ? "/" : Source.Attributes["Name"].Value),-40} -> {Destination.GetPath()} ", ConsoleColor.Yellow);
 
         XmlNode ToCopy = Source.Clone();
         Destination.AppendChild(ToCopy);
 
-        Util.BeginSpinningCursorAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 25, 150, 20, Console.GetCursorPosition());
+        Util.BeginCharacterAnimation(new char[8] { '|', '/', '-', '\\', '|', '/', '-', '\\' }, 25, 150, 20, Console.GetCursorPosition());
         Util.WriteLineColor("√", ConsoleColor.Green);
 
         Console.CursorVisible = true;
@@ -445,7 +473,7 @@ public static class Commands
             if (Argument.Contains('/'))
 			{
 				Console.WriteLine("Name cannot contain slashes");
-				Console.WriteLine("To create in a directory besides the CWD, specify the [p] or [path] named parameter with the directory you wish to create in");
+				Console.WriteLine("To create in a directory besides the CWD, specify the p= or path= named argument with the directory you wish to create in");
 				Console.WriteLine();
 				Console.WriteLine("(that last bit is not implemented yet, sorry)");
                 return;
@@ -545,7 +573,7 @@ public static class Commands
         // Handle no arguments
         if (Query.Arguments.Count == 0)
         {
-			Console.WriteLine("Insufficient parameters");
+			Console.WriteLine("Insufficient arguments");
             return;
 		}
 
@@ -576,7 +604,7 @@ public static class Commands
 	{
         if (Query.Arguments.Count < 2)
 		{
-			Console.WriteLine("Insufficient parameters");
+			Console.WriteLine("Insufficient arguments");
             return;
 		}
 
@@ -635,7 +663,7 @@ public static class Commands
 	{
         if (Query.Arguments.Count == 0)
 		{
-			Console.WriteLine("Insufficient parameters");
+			Console.WriteLine("Insufficient arguments");
             return;
 		}
 
@@ -700,7 +728,7 @@ public static class Commands
     {
         if (Query.Arguments.Count == 0)
 		{
-			Console.WriteLine("Insufficient parameters");
+			Console.WriteLine("Insufficient arguments");
             return;
 		}
 

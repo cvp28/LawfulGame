@@ -22,7 +22,24 @@ public enum PermissionType : int
 	Write,
 	Execute
 }
-	
+
+// Standard file permissions set that is not hard to understand
+public enum FilePermission : int
+{
+	Read,		// Able to get the file's contents
+	Write,		// Able to modify the file's contents
+	Execute		// Able to invoke the file as an executable, whether it is one or not
+}
+
+// Standard Windows-inspired directory permissions set
+// Why is it Windows-inspired if Linux is so fucking amazing? Because the Windows one is extensible, robust, and EASY TO UNDERSTAND
+public enum DirectoryPermission : int
+{
+	Enter,			// Able to CD into the directory
+	List,			// Able to list directory contents
+	Modify			// Able to add/remove files/folders from this directory
+}
+
 // Might expand on this later
 public enum FSNodeType
 {
@@ -32,12 +49,12 @@ public enum FSNodeType
 
 public static class FSAPI
 {
-	public static dynamic? Locate(UserSession Session, string Path)
+	public static dynamic Locate(UserSession Session, string Path)
 	{
-		XmlNode? Traverser;
+		XmlNode Traverser;
 
 		if (Path[0] == '/')
-			Traverser = Session?.Host?.FileSystemRoot;
+			Traverser = Session.Host.FileSystemRoot;
 		else
 			Traverser = Session.PathNode;
 
@@ -48,27 +65,27 @@ public static class FSAPI
 			switch (Element)
 			{
 				case "*":
-					if (Traverser?.ChildNodes.Count == 0)
+					if (Traverser.ChildNodes.Count == 0)
 						return null;
-					else if (Traverser?.ChildNodes.Count == 1)
+					else if (Traverser.ChildNodes.Count == 1)
 						return Traverser.FirstChild;
 					else
-						return Traverser?.ChildNodes;
+						return Traverser.ChildNodes;
 
 				case "..":
-					if (Traverser?.Name == "Root")
+					if (Traverser.Name == "Root")
 						return null;
 
-					Traverser = Traverser?.ParentNode;
+					Traverser = Traverser.ParentNode;
 					break;
 
 				case ".":
-					Traverser = Session?.PathNode;
+					Traverser = Session.PathNode;
 					break;
 
 				default:
-					XmlNode? TryDirectory = Traverser?.SelectSingleNode($"Directory[@Name='{Element}']");
-					XmlNode? TryFile = Traverser?.SelectSingleNode($"File[@Name='{Element}']");
+					XmlNode TryDirectory = Traverser.SelectSingleNode($"Directory[@Name='{Element}']");
+					XmlNode TryFile = Traverser.SelectSingleNode($"File[@Name='{Element}']");
 
 					if (TryDirectory is not null)
 						Traverser = TryDirectory;
@@ -84,9 +101,9 @@ public static class FSAPI
 		return Traverser;
 	}
 
-	public static XmlNode? LocateFile(UserSession Session, string Path)
+	public static XmlNode LocateFile(UserSession Session, string Path)
 	{
-		dynamic? Result = Locate(Session, Path);
+		dynamic Result = Locate(Session, Path);
 
 		if (Result == null)
 			return null;
@@ -104,9 +121,9 @@ public static class FSAPI
 		}
 	}
 
-	public static XmlNode? LocateDirectory(UserSession Session, string Path)
+	public static XmlNode LocateDirectory(UserSession Session, string Path)
 	{
-		dynamic? Result = Locate(Session, Path);
+		dynamic Result = Locate(Session, Path);
 
 		if (Result == null)
 			return null;
@@ -124,13 +141,13 @@ public static class FSAPI
 		}
 	}
 
-	public static bool TryGetNode(UserSession Session, string Path, out dynamic? Result)
+	public static bool TryGetNode(UserSession Session, string Path, out dynamic Result)
 	{
 		Result = Locate(Session, Path);
 		return Result != null;
 	}
 
-	public static bool TryGetNode(UserSession Session, string Path, FSNodeType Type, out XmlNode? Node)
+	public static bool TryGetNode(UserSession Session, string Path, FSNodeType Type, out XmlNode Node)
 	{
 		switch (Type)
 		{
@@ -176,9 +193,9 @@ public static class FSAPI
 			if (!NodePermissions.Valid)
 				return false;
 
-			if (NodePermissions.Owner == Session?.User?.Username)
+			if (NodePermissions.Owner == Session.User.Username)
 				return true;
-			else if (Session?.User?.Username == "root")
+			else if (Session.User.Username == "root")
 				return TestPermissionLevelForTypes(NodePermissions.RootPerms, Permissions);
 			else
 				return TestPermissionLevelForTypes(NodePermissions.OtherPerms, Permissions);
@@ -238,23 +255,23 @@ public static class FSAPI
 		_ => false
 	};
 
-	public static XmlNode? GetNodeFromPath(this Computer Computer, string Query)
+	public static XmlNode GetNodeFromPath(this Computer Computer, string Query)
 	{
 		if (Query.Length == 0) { return null; }
 
 		string[] QueryElements = Query.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
-		XmlNode? Traverser = Computer.FileSystemRoot;
+		XmlNode Traverser = Computer.FileSystemRoot;
 
 		foreach (string Element in QueryElements)
 		{
-			if (Traverser?.SelectSingleNode($"File[@Name='{Element}']") != null)
+			if (Traverser.SelectSingleNode($"File[@Name='{Element}']") != null)
 			{
 				Traverser = Traverser.SelectSingleNode($"File[@Name='{Element}']");
 				// If we reach a file, then break because you cannot go further after finding a file
 				break;
 			}
-			else if (Traverser?.SelectSingleNode($"Directory[@Name='{Element}']") != null)
+			else if (Traverser.SelectSingleNode($"Directory[@Name='{Element}']") != null)
 				Traverser = Traverser.SelectSingleNode($"Directory[@Name='{Element}']");
 			else
 				return null;
@@ -307,6 +324,101 @@ public static class FSAPI
 		}
 
 		return Path.ToString();
+	}
+
+	// Function to enumerate permissions data of a directory node
+	public static (string Owner, List<DirectoryPermission> RootPermissions, List<DirectoryPermission> OtherPermissions) GetDirectoryPermissionsData(this XmlNode Node)
+	{
+		// <Directory Perms="root:elm:elm">
+
+		string[] PermissionsElements = Node.Attributes["Perms"].Value.Split(':');
+
+		if (PermissionsElements.Length < 3)
+			return (null, null, null);
+
+		string Owner = PermissionsElements[0];
+		char[] RootPermissionsElement = PermissionsElements[1].ToArray();
+		char[] OtherPermissionsElement = PermissionsElements[2].ToArray();
+
+		List<DirectoryPermission> RootPermissions = ProcessDirectoryPermissions(RootPermissionsElement);
+		List<DirectoryPermission> OtherPermissions = ProcessDirectoryPermissions(OtherPermissionsElement);
+
+		return (Owner, RootPermissions, OtherPermissions);
+
+		static List<DirectoryPermission> ProcessDirectoryPermissions(char[] PermissionsElement)
+		{
+			List<DirectoryPermission> Temp = new();
+
+			foreach (char c in PermissionsElement)
+			{
+				switch (c)
+				{
+					case 'e':
+					case 'E':
+						Temp.Add(DirectoryPermission.Enter);
+						break;
+
+					case 'l':
+					case 'L':
+						Temp.Add(DirectoryPermission.List);
+						break;
+
+					case 'm':
+					case 'M':
+						Temp.Add(DirectoryPermission.Modify);
+						break;
+				}
+			}
+
+			return Temp;
+		}
+	}
+
+	public static (string Owner, List<FilePermission> RootPermissions, List<FilePermission> OtherPermissions) GetFilePermissionsData(this XmlNode Node)
+	{
+		// <Directory Perms="root:elm:elm">
+
+		string[] PermissionsElements = Node.Attributes["Perms"].Value.Split(':');
+
+		if (PermissionsElements.Length < 3)
+			return (null, null, null);
+
+		string Owner = PermissionsElements[0];
+		char[] RootPermissionsElement = PermissionsElements[1].ToArray();
+		char[] OtherPermissionsElement = PermissionsElements[2].ToArray();
+
+		List<FilePermission> RootPermissions = ProcessFilePermissions(RootPermissionsElement);
+		List<FilePermission> OtherPermissions = ProcessFilePermissions(OtherPermissionsElement);
+
+		return (Owner, RootPermissions, OtherPermissions);
+
+		static List<FilePermission> ProcessFilePermissions(char[] PermissionsElement)
+		{
+			List<FilePermission> Temp = new();
+
+			foreach (char c in PermissionsElement)
+			{
+				switch (c)
+				{
+					case 'r':
+					case 'R':
+						Temp.Add(FilePermission.Read);
+						break;
+
+					case 'w':
+					case 'W':
+						Temp.Add(FilePermission.Write);
+						break;
+
+					case 'e':
+					case 'E':
+						Temp.Add(FilePermission.Execute);
+						break;
+				}
+			}
+
+			return Temp;
+		}
 	}
 
 	public static (bool Valid, string Owner, PermissionLevel RootPerms, PermissionLevel OtherPerms) GetPermissionsData(this XmlNode Node)

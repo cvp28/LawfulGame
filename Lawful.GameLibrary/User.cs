@@ -62,7 +62,7 @@ namespace Lawful.GameLibrary
 			xs.Serialize(fs, this);
 		}
 	
-		public static User? DeserializeFromFile(string Path)
+		public static User DeserializeFromFile(string Path)
 		{
 			if (!File.Exists(Path))
 				throw new Exception($"Could not find file referenced by '{Path}'");

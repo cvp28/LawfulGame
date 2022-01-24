@@ -73,7 +73,7 @@ public static class MissionAPI
     public static T GetMissionData<T>(string Name)
     {
         Type TryType = CurrentMissionAssembly.GetType($"{MissionAssemblyNamespace}.{MissionAssemblyDataClassName}");
-        FieldInfo TryField = TryType?.GetRuntimeField(Name);
+        FieldInfo TryField = TryType.GetRuntimeField(Name);
 
         if (TryType is not null && TryField is not null)
             return (T)TryField.GetValue(0);
@@ -84,7 +84,7 @@ public static class MissionAPI
     public static void SetMissionData(string Name, object Value)
     {
         Type TryType = CurrentMissionAssembly.GetType($"{MissionAssemblyNamespace}.{MissionAssemblyDataClassName}");
-        FieldInfo TryField = TryType?.GetRuntimeField(Name);
+        FieldInfo TryField = TryType.GetRuntimeField(Name);
 
         if (TryType is not null && TryField is not null)
             TryField.SetValue(null, Value);

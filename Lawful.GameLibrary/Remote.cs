@@ -18,7 +18,7 @@ public enum RSIStatus
 public static class Remote
 {
 	// Function determines if a query validly addresses a remote system and, regardless, returns all the discernable elements of that query using the out strings
-	public static RSIStatus TryGetRSI(string Query, out UserAccount? User, out Computer? Host, out string Path)
+	public static RSIStatus TryGetRSI(string Query, out UserAccount User, out Computer Host, out string Path)
 	{
 		if (!Query.Contains(':') || !Query.Contains('@'))
 		{
@@ -58,7 +58,7 @@ public static class Remote
 			return RSIStatus.InvalidIP;
 		}
 
-		Computer? TryPC = Computers.GetComputer(RSIElements[1]);
+		Computer TryPC = Computers.GetComputer(RSIElements[1]);
 
 		if (TryPC is null)
 		{
@@ -76,7 +76,7 @@ public static class Remote
 			return RSIStatus.Redundant;
 		}
 
-		UserAccount? TryUser = TryPC.GetUser(RSIElements[0]);
+		UserAccount TryUser = TryPC.GetUser(RSIElements[0]);
 
 		if (TryUser is null)
 		{

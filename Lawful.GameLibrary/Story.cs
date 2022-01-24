@@ -5,10 +5,10 @@ namespace Lawful.GameLibrary
 	public class Story
 	{
 		[XmlAttribute("Name")]
-		public string? Name { get; set; }
+		public string Name { get; set; }
 
 		[XmlAttribute("Start")]
-		public string? StartMissionID { get; set; }
+		public string StartMissionID { get; set; }
 
 		[XmlElement("Mission")]
 		public List<StoryMission> Missions;

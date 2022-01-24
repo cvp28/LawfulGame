@@ -11,3 +11,12 @@ C:\Users\Carson\source\repos\LawfulGameNet6\Missions\Intro\obj\Release\net6.0\In
 C:\Users\Carson\source\repos\LawfulGameNet6\Missions\Intro\obj\Release\net6.0\Intro.dll
 C:\Users\Carson\source\repos\LawfulGameNet6\Missions\Intro\obj\Release\net6.0\ref\Intro.dll
 C:\Users\Carson\source\repos\LawfulGameNet6\Missions\Intro\obj\Release\net6.0\Intro.pdb
+C:\Users\Carson\source\repos\LawfulGame\Missions\Intro\obj\Release\net6.0\Intro.csproj.AssemblyReference.cache
+C:\Users\Carson\source\repos\LawfulGame\Missions\Intro\obj\Release\net6.0\Intro.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Carson\source\repos\LawfulGame\Missions\Intro\obj\Release\net6.0\Intro.AssemblyInfoInputs.cache
+C:\Users\Carson\source\repos\LawfulGame\Missions\Intro\obj\Release\net6.0\Intro.AssemblyInfo.cs
+C:\Users\Carson\source\repos\LawfulGame\Missions\Intro\obj\Release\net6.0\Intro.csproj.CoreCompileInputs.cache
+C:\Users\Carson\source\repos\LawfulGame\Missions\Intro\obj\Release\net6.0\Intro.csproj.CopyComplete
+C:\Users\Carson\source\repos\LawfulGame\Missions\Intro\obj\Release\net6.0\Intro.dll
+C:\Users\Carson\source\repos\LawfulGame\Missions\Intro\obj\Release\net6.0\ref\Intro.dll
+C:\Users\Carson\source\repos\LawfulGame\Missions\Intro\obj\Release\net6.0\Intro.pdb
