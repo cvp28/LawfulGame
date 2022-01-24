@@ -4,7 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
-    <BaseOutputPath>C:\Users\Carson\source\repos\LawfulGameNet6\Content\Story\Lawful\Missions\Intro</BaseOutputPath>
+    <BaseOutputPath>..\..\Content\Story\Lawful\Missions\$(MSBuildProjectName)\</BaseOutputPath>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
   </PropertyGroup>
 
   <ItemGroup>
