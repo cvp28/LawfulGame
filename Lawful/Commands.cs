@@ -134,151 +134,155 @@ public static class Commands
 		}
     }
 
-    private static List<UserSession> ActiveSessions = new();
+    #region TODO (Carson): Update SecureCopy
+
+    //  private static List<UserSession> ActiveSessions = new();
 
     // TODO (Carson): Figure out a way to check for permissions on the origin and destination(s) via the repsective users accessing them
 
-    // 1) Check the origin to the extent where the relevant user has WRITE permissions for the parent of every node of the specified path
-    // 2) Check all destinations to the extent where users have WRITE permissions for the specified path
+    // 1) Check the origin to the extent where the relevant user has MODIFY permissions for the parent of every node of the specified path
+    // 2) Check all destinations to the extent where users have MODIFY permissions for the specified path
 
-    public static void SecureCopy(InputQuery Query)
-	{
-        // No matter what, every new execution of the command will start with an empty list of active UserSessions
-        ActiveSessions.Clear();
+    //  public static void SecureCopy(InputQuery Query)
+    //  {
+    //      // No matter what, every new execution of the command will start with an empty list of active UserSessions
+    //      ActiveSessions.Clear();
+    //  
+    //      if (Query.Arguments.Count == 0)
+    //  	{
+    //  		Util.WriteLineColor("Insufficent arguments", ConsoleColor.Red);
+    //          return;
+    //  	}
+    //  
+    //      string Path;
+    //      UserSession Current;
+    //  
+    //      if (Remote.TryGetRSI(Query.Arguments[0], out UserAccount RemoteOriginUser, out Computer RemoteOriginHost, out string RemoteOriginPath) == RSIStatus.Complete)
+    //  	{
+    //          Util.WriteLineColor($"Connected to {RemoteOriginHost.Address}!", ConsoleColor.Green);
+    //          // remote origin
+    //          if (!Util.TryUserLogin(RemoteOriginUser, 3))
+    //          {
+    //              Util.WriteLineColor("Login cancelled or 3 invalid attempts were made", ConsoleColor.Red);
+    //              return;
+    //          }
+    //  
+    //          Path = RemoteOriginPath;
+    //          Current = UserSession.FromConstituents(RemoteOriginHost, RemoteOriginUser);
+    //          ActiveSessions.Add(Current);
+    //      }
+    //      else
+    //  	{
+    //          // local origin
+    //          Path = Query.Arguments[0];
+    //          Current = Player.CurrentSession;
+    //      }
+    //  
+    //      dynamic Origin = FSAPI.Locate(Current, Path);
+    //  
+    //      if (Origin is null)
+    //  	{
+    //          Util.WriteLineColor($"Could not locate '{Path}'", ConsoleColor.Red);
+    //          return;
+    //      }
+    //      
+    //      switch (Origin)
+    //  	{
+    //          case XmlNode n:
+    //              if (!FSAPI.UserHasPermissions(Current, n.ParentNode, PermissionType.Write))
+    //  			{
+    //                  Util.WriteLineColor($"Insufficient permissions for '{n.GetPath()}'", ConsoleColor.Red);
+    //                  return;
+    //              }
+    //              break;
+    //  
+    //          case XmlNodeList nl:
+    //              foreach (XmlNode n in nl)
+    //  			{
+    //                  if (!FSAPI.UserHasPermissions(Current, n.ParentNode, PermissionType.Write))
+    //                  {
+    //                      Util.WriteLineColor($"Insufficient permissions for '{n.GetPath()}'", ConsoleColor.Red);
+    //                      return;
+    //                  }
+    //              }
+    //              break;
+    //  	}
+    //  
+    //      // At this point, we have a valid origin but we do not know where to put it
+    //  
+    //      if (Query.Arguments.Count >= 2)
+    //  	{
+    //          XmlNode Destination;
+    //  
+    //          // For every destination argument after the origin
+    //          for (int i = 1; i < Query.Arguments.Count; i++)
+    //  		{
+    //              if (Remote.TryGetRSI(Query.Arguments[i], out UserAccount RemoteDestinationUser, out Computer RemoteDestinationHost, out string RemoteDestinationPath) == RSIStatus.Complete)
+    //  			{
+    //                  // If, for every session, it is true that this remote query does not reference it, we know it is not in the list of active sessions and must be validated
+    //                  if (ActiveSessions.TrueForAll(session => session.User != RemoteDestinationUser && session.Host != RemoteDestinationHost))
+    //                  {
+    //                      // remote origin
+    //                      if (!Util.TryUserLogin(RemoteDestinationUser, 3))
+    //                      {
+    //                          Util.WriteLineColor("Login cancelled or 3 invalid attempts were made", ConsoleColor.Red);
+    //                          return;
+    //                      }
+    //  
+    //                      Current = UserSession.FromConstituents(RemoteDestinationHost, RemoteDestinationUser);
+    //                      ActiveSessions.Add(Current);
+    //                  }
+    //  
+    //                  Current = ActiveSessions.Find(session => session.User == RemoteDestinationUser && session.Host == RemoteDestinationHost);
+    //                  Destination = FSAPI.LocateDirectory(Current, RemoteDestinationPath);
+    //  
+    //                  if (Destination is null)
+    //  				{
+    //                      Util.WriteLineColor($"Could not find directory '{RemoteDestinationUser}@{RemoteDestinationHost}:{RemoteDestinationPath}'", ConsoleColor.Red);
+    //                      return;
+    //  				}
+    //  
+    //                  if (!FSAPI.UserHasPermissions(Current, Destination, PermissionType.Read))
+    //  				{
+    //                      Util.WriteLineColor($"Insufficient permissions for '{RemoteDestinationUser}@{RemoteDestinationHost}:{RemoteDestinationPath}'", ConsoleColor.Red);
+    //                      return;
+    //  				}
+    //              }
+    //              else
+    //  			{
+    //                  Current = Player.CurrentSession;
+    //                  Destination = FSAPI.LocateDirectory(Current, Query.Arguments[i]);
+    //  
+    //                  if (Destination is null)
+    //                  {
+    //                      Util.WriteLineColor($"Could not find directory '{Query.Arguments[i]}'", ConsoleColor.Red);
+    //                      return;
+    //                  }
+    //  
+    //                  if (!FSAPI.UserHasPermissions(Current, Destination, PermissionType.Write))
+    //  				{
+    //                      Util.WriteLineColor($"Insufficient permissions for '{Query.Arguments[i]}'", ConsoleColor.Red);
+    //                      return;
+    //  				}
+    //              }
+    //                  
+    //              // Copy the file(s) here
+    //              switch (Origin)
+    //  			{
+    //                  case XmlNode n:
+    //                      AnimatedFileTransfer(n, Destination);
+    //                      break;
+    //  
+    //                  case XmlNodeList nl:
+    //                      foreach (XmlNode n in nl)
+    //                          AnimatedFileTransfer(n, Destination);
+    //                      break;
+    //  			}
+    //  		}
+    //  	}
+    //  }
 
-        if (Query.Arguments.Count == 0)
-		{
-			Util.WriteLineColor("Insufficent arguments", ConsoleColor.Red);
-            return;
-		}
-
-        string Path;
-        UserSession Current;
-
-        if (Remote.TryGetRSI(Query.Arguments[0], out UserAccount RemoteOriginUser, out Computer RemoteOriginHost, out string RemoteOriginPath) == RSIStatus.Complete)
-		{
-            Util.WriteLineColor($"Connected to {RemoteOriginHost.Address}!", ConsoleColor.Green);
-            // remote origin
-            if (!Util.TryUserLogin(RemoteOriginUser, 3))
-            {
-                Util.WriteLineColor("Login cancelled or 3 invalid attempts were made", ConsoleColor.Red);
-                return;
-            }
-
-            Path = RemoteOriginPath;
-            Current = UserSession.FromConstituents(RemoteOriginHost, RemoteOriginUser);
-            ActiveSessions.Add(Current);
-        }
-        else
-		{
-            // local origin
-            Path = Query.Arguments[0];
-            Current = Player.CurrentSession;
-        }
-
-        dynamic Origin = FSAPI.Locate(Current, Path);
-
-        if (Origin is null)
-		{
-            Util.WriteLineColor($"Could not locate '{Path}'", ConsoleColor.Red);
-            return;
-        }
-        
-        switch (Origin)
-		{
-            case XmlNode n:
-                if (!FSAPI.UserHasPermissions(Current, n.ParentNode, PermissionType.Write))
-				{
-                    Util.WriteLineColor($"Insufficient permissions for '{n.GetPath()}'", ConsoleColor.Red);
-                    return;
-                }
-                break;
-
-            case XmlNodeList nl:
-                foreach (XmlNode n in nl)
-				{
-                    if (!FSAPI.UserHasPermissions(Current, n.ParentNode, PermissionType.Write))
-                    {
-                        Util.WriteLineColor($"Insufficient permissions for '{n.GetPath()}'", ConsoleColor.Red);
-                        return;
-                    }
-                }
-                break;
-		}
-
-        // At this point, we have a valid origin but we do not know where to put it
-
-        if (Query.Arguments.Count >= 2)
-		{
-            XmlNode Destination;
-
-            // For every destination argument after the origin
-            for (int i = 1; i < Query.Arguments.Count; i++)
-			{
-                if (Remote.TryGetRSI(Query.Arguments[i], out UserAccount RemoteDestinationUser, out Computer RemoteDestinationHost, out string RemoteDestinationPath) == RSIStatus.Complete)
-				{
-                    // If, for every session, it is true that this remote query does not reference it, we know it is not in the list of active sessions and must be validated
-                    if (ActiveSessions.TrueForAll(session => session.User != RemoteDestinationUser && session.Host != RemoteDestinationHost))
-                    {
-                        // remote origin
-                        if (!Util.TryUserLogin(RemoteDestinationUser, 3))
-                        {
-                            Util.WriteLineColor("Login cancelled or 3 invalid attempts were made", ConsoleColor.Red);
-                            return;
-                        }
-
-                        Current = UserSession.FromConstituents(RemoteDestinationHost, RemoteDestinationUser);
-                        ActiveSessions.Add(Current);
-                    }
-
-                    Current = ActiveSessions.Find(session => session.User == RemoteDestinationUser && session.Host == RemoteDestinationHost);
-                    Destination = FSAPI.LocateDirectory(Current, RemoteDestinationPath);
-
-                    if (Destination is null)
-					{
-                        Util.WriteLineColor($"Could not find directory '{RemoteDestinationUser}@{RemoteDestinationHost}:{RemoteDestinationPath}'", ConsoleColor.Red);
-                        return;
-					}
-
-                    if (!FSAPI.UserHasPermissions(Current, Destination, PermissionType.Read))
-					{
-                        Util.WriteLineColor($"Insufficient permissions for '{RemoteDestinationUser}@{RemoteDestinationHost}:{RemoteDestinationPath}'", ConsoleColor.Red);
-                        return;
-					}
-                }
-                else
-				{
-                    Current = Player.CurrentSession;
-                    Destination = FSAPI.LocateDirectory(Current, Query.Arguments[i]);
-
-                    if (Destination is null)
-                    {
-                        Util.WriteLineColor($"Could not find directory '{Query.Arguments[i]}'", ConsoleColor.Red);
-                        return;
-                    }
-
-                    if (!FSAPI.UserHasPermissions(Current, Destination, PermissionType.Write))
-					{
-                        Util.WriteLineColor($"Insufficient permissions for '{Query.Arguments[i]}'", ConsoleColor.Red);
-                        return;
-					}
-                }
-                    
-                // Copy the file(s) here
-                switch (Origin)
-				{
-                    case XmlNode n:
-                        AnimatedFileTransfer(n, Destination);
-                        break;
-
-                    case XmlNodeList nl:
-                        foreach (XmlNode n in nl)
-                            AnimatedFileTransfer(n, Destination);
-                        break;
-				}
-			}
-		}
-	}
+    #endregion
 
     public static void AnimatedFileTransfer(XmlNode Source, XmlNode Destination)
     {
@@ -294,155 +298,6 @@ public static class Commands
 
         Console.CursorVisible = true;
     }
-
-    //  private static List<Computer> ConnectedPCs = new();
-    //  private static List<UserAccount> LoggedInAccounts = new();
-    //  
-    //  public static void SecureCopy(InputQuery Query)
-    //  {
-    //      if (Query.Arguments.Count == 0)
-    //  	{
-    //  		Console.WriteLine("Insufficient arguments");
-    //          return;
-    //  	}
-    //  
-    //      if (Query.Arguments.Count == 1)
-    //  	{
-    //          (bool Succeeded, dynamic Source) Arg1 = HandleOtherSCPArg(Query.Arguments[0]);
-    //  
-    //          XmlNode UserDir = Player.HomePC.GetNodeFromPath($"/home/{Player.ProfileName}");
-    //          XmlNode UserBin = Player.HomePC.GetNodeFromPath("/bin");
-    //  
-    //          if (!Arg1.Succeeded) // The argument handler already prints our error messages for us so we just have to return
-    //          {
-    //              ConnectedPCs.Clear();
-    //              LoggedInAccounts.Clear();
-    //              return;
-    //          }
-    //  
-    //          switch (Arg1.Source)
-    //  		{
-    //              case XmlNode n:
-    //                  if (n.Attributes["Command"] is not null)
-    //                      AnimatedFileTransfer(n, UserBin);
-    //                  else
-    //                      AnimatedFileTransfer(n, UserDir);
-    //                  break;
-    //  
-    //              case XmlNodeList nl:
-    //                  foreach (XmlNode n in nl)
-    //  				{
-    //                      if (n.Attributes["Command"] is not null)
-    //                          AnimatedFileTransfer(n, UserBin);
-    //                      else
-    //                          AnimatedFileTransfer(n, UserDir);
-    //                  }
-    //                  break;
-    //  		}
-    //  	}
-    //      else
-    //  	{
-    //          (bool Succeeded, dynamic Source) Arg1 = HandleOtherSCPArg(Query.Arguments[0]);
-    //          (bool Succeeded, dynamic Source) Arg2 = HandleOtherSCPArg(Query.Arguments[1]);
-    //  
-    //          if (!Arg1.Succeeded || !Arg2.Succeeded)
-    //          {
-    //              ConnectedPCs.Clear();
-    //              LoggedInAccounts.Clear();
-    //              return;
-    //          }
-    //  
-    //          // Sort out the destination
-    //          switch (Arg2.Source)
-    //  		{
-    //              case XmlNode n:
-    //                  if (n.Name != "Directory" && n.Name != "Root")
-    //                      goto default;       // Handly little feature, I must say
-    //                  break;
-    //  
-    //              default:
-    //  				Console.WriteLine("Invalid destination, must be a folder");
-    //                  ConnectedPCs.Clear();
-    //                  LoggedInAccounts.Clear();
-    //                  return;
-    //  		}
-    //  
-    //          // Sort out the source
-    //          switch (Arg1.Source)
-    //          {
-    //              case XmlNode n:
-    //                  AnimatedFileTransfer(n, Arg2.Source);
-    //                  break;
-    //  
-    //              case XmlNodeList nl:
-    //                  foreach (XmlNode n in nl)
-    //                      AnimatedFileTransfer(n, Arg2.Source);
-    //                  break;
-    //          }
-    //      }
-    //      ConnectedPCs.Clear();
-    //      LoggedInAccounts.Clear();
-    //  }
-    //
-
-    //  
-    //  public static (bool, dynamic) HandleOtherSCPArg(string Argument)
-    //  {
-    //      // first we're going to determine the type of query
-    //      RSIStatus QueryRSIStatus = Remote.GetRSIStatus(Argument);
-    //  
-    //      dynamic Source;
-    //  
-    //      switch (QueryRSIStatus)
-    //      {
-    //          case RSIStatus.None:
-    //              // local query, use LocalLocate
-    //              Source = NodeLocator.LocalLocate(Argument, in Player.ConnectionInfo);
-    //              break;
-    //  
-    //          case RSIStatus.Complete:
-    //              // remote query, use RemoteLocate with new ConnectionInfo
-    //              string RSI = Argument.Split(':')[0];
-    //              string[] RSIElements = RSI.Split('@');
-    //  
-    //              Computer PC = Computers.GetComputer(RSIElements[1]);
-    //  
-    //              if (!ConnectedPCs.Contains(PC)) // If we do not already have an active session on this computer, create one.
-    //              {
-    //                  ConnectedPCs.Add(PC);
-    //  				Console.WriteLine($"Connected to {PC.Name}@{PC.Address}");
-    //              }
-    //  
-    //              UserAccount Account = PC.GetUser(RSIElements[0]);
-    //  
-    //              if (!LoggedInAccounts.Contains(Account))    // If we are not already logged in to this particular account, log in.
-    //  			{
-    //                  Util.DoUserLogin(Account, 3);
-    //                  LoggedInAccounts.Add(Account);
-    //              }
-    //  
-    //              ConnectionInfo New = new() { PC = Computers.GetComputer(RSIElements[1]), User = Account };
-    //              Source = NodeLocator.RemoteLocate(Argument, in New);
-    //              break;
-    //  
-    //          default:
-    //              Console.WriteLine($"Error in query '{QueryRSIStatus}'");
-    //              return (false, null);
-    //      }
-    //  
-    //      switch (Source)
-    //      {
-    //          case XmlNode n:
-    //              return (true, n);
-    //  
-    //          case XmlNodeList nl:
-    //              return (true, nl);
-    //  
-    //          default:
-    //              Console.WriteLine($"Unable to resolve source query '{Argument}'");
-    //              return (false, null);
-    //      }
-    //  }
 
     public static void MakeDirectory(InputQuery Query)
 	{
@@ -465,6 +320,15 @@ public static class Commands
             if (NameConflict)
 			{
 				Console.WriteLine("An object with that name already exists");
+                return;
+			}
+
+            // Check for MODIFY permissions in the current directory here
+            bool HasPermissions = FSAPI.UserHasDirectoryPermissions(Player.CurrentSession, Player.CurrentSession.PathNode, DirectoryPermission.Modify);
+
+            if (!HasPermissions)
+			{
+				Console.WriteLine("Insufficient permissions");
                 return;
 			}
 
@@ -520,7 +384,7 @@ public static class Commands
 
 		if (NodeToList.Name == "File")
 		{
-            if (!FSAPI.UserHasPermissions(Player.CurrentSession, NodeToList, PermissionType.Read))
+            if (!FSAPI.UserHasFilePermissions(Player.CurrentSession, NodeToList, FilePermission.Read))
             {
                 Console.WriteLine($"'{Player.CurrentSession.User.Username}' is not permitted to perform that action");
                 return;
@@ -540,7 +404,7 @@ public static class Commands
             return;
 		}
 
-        if ( !FSAPI.UserHasPermissions(Player.CurrentSession, NodeToList, PermissionType.Read, PermissionType.Execute) )
+        if ( !FSAPI.UserHasDirectoryPermissions(Player.CurrentSession, NodeToList, DirectoryPermission.List) )
         {
             Console.WriteLine($"'{Player.CurrentSession.User.Username}' is not permitted to perform that action");
             return;
@@ -591,7 +455,7 @@ public static class Commands
             return;
         }
 
-        if (!FSAPI.UserHasPermissions(Player.CurrentSession, TryDirectory, PermissionType.Execute))
+        if (!FSAPI.UserHasDirectoryPermissions(Player.CurrentSession, TryDirectory, DirectoryPermission.Enter))
 		{
             Console.WriteLine($"'{Player.CurrentSession.User.Username}' is not permitted to perform that action");
             return;
@@ -629,9 +493,24 @@ public static class Commands
             return;
         }
 
+        // Both origin and destination need to have MODIFY permissions for the current user
+        bool DestinationHasModifyPerms = FSAPI.UserHasDirectoryPermissions(Player.CurrentSession, Destination, DirectoryPermission.Modify);
+        if (!DestinationHasModifyPerms)
+		{
+			Console.WriteLine($"{Player.CurrentSession.User.Username} is not permitted to perform that action on {Destination.GetPath()}");
+            return;
+		}
+
         switch (Origin)
 		{
             case XmlNode o:
+                XmlNode Parent = o.ParentNode;
+                if (!FSAPI.UserHasDirectoryPermissions(Player.CurrentSession, Parent, DirectoryPermission.Modify))
+				{
+                    Console.WriteLine($"{Player.CurrentSession.User.Username} is not permitted to perform that action on {o.GetPath()}");
+                    return;
+                }
+
                 Destination.AppendChild(o);
                 break;
 
@@ -640,6 +519,13 @@ public static class Commands
 
                 for (int i = 0; i < count; i++)
                 {
+                    XmlNode CurrentParent = nl[i].ParentNode;
+                    if (!FSAPI.UserHasDirectoryPermissions(Player.CurrentSession, CurrentParent, DirectoryPermission.Modify))
+					{
+                        Console.WriteLine($"{Player.CurrentSession.User.Username} is not permitted to perform that action on {nl[i].GetPath()}");
+                        continue;
+                    }
+
                     //if (nl[i] == Player.CurrentShell.PathNode) // An origin query involving multiple items may include the current directory so we must check for that
                     //    Player.CurrentShell.PathNode = d;
 
@@ -647,16 +533,6 @@ public static class Commands
                 }
                 break;
 		}
-	}
-
-	public static XmlNode LocateNode(string Query)
-	{
-		if (Query.Length == 0) { return null; }
-
-        if (Query[0] == '/')
-            return Player.CurrentSession.Host.GetNodeFromPath(Query);
-        else
-            return Player.CurrentSession.PathNode.GetNodeFromPath(Query);
 	}
 
     public static void Remove(InputQuery Query)
@@ -694,6 +570,12 @@ public static class Commands
                     }
                     Traverser = Traverser.ParentNode;
                 }
+                
+                if (!FSAPI.UserHasDirectoryPermissions(Player.CurrentSession, n.ParentNode, DirectoryPermission.Modify))
+				{
+                    Console.WriteLine($"{Player.CurrentSession.User.Username} is not permitted to perform that action on {n.GetPath()}");
+                    return;
+				}
 
                 n.ParentNode.RemoveChild(n);
                 break;
@@ -714,7 +596,14 @@ public static class Commands
                 }
 
                 for (int i = nl.Count - 1; i >= 0; i--)
+                {
+                    if (!FSAPI.UserHasDirectoryPermissions(Player.CurrentSession, nl[i].ParentNode, DirectoryPermission.Modify))
+                    {
+                        Console.WriteLine($"{Player.CurrentSession.User.Username} is not permitted to perform that action on {nl[i].GetPath()}");
+                        continue;
+                    }
                     Parent.RemoveChild(nl[i]);
+                }
 
                 break;
 
@@ -741,6 +630,12 @@ public static class Commands
         if (!FSAPI.TryGetNode(Player.CurrentSession, Query.Arguments[0], FSNodeType.File, out XmlNode File))
 		{
             Console.WriteLine($"Could not find file '{Query.Arguments[0]}'");
+            return;
+        }
+
+        if (!FSAPI.UserHasFilePermissions(Player.CurrentSession, File, FilePermission.Read))
+		{
+            Console.WriteLine($"{Player.CurrentSession.User.Username} is not permitted to perform that action on {File.GetPath()}");
             return;
         }
 

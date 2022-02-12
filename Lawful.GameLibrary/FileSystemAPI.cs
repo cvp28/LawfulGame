@@ -37,7 +37,7 @@ public enum DirectoryPermission : int
 {
 	Enter,			// Able to CD into the directory
 	List,			// Able to list directory contents
-	Modify			// Able to add/remove files/folders from this directory
+	Modify			// Able to add/remove files/folders to/from this directory
 }
 
 // Might expand on this later
@@ -167,93 +167,81 @@ public static class FSAPI
 		return Node != null;
 	}
 
-	public static bool UserHasPermissions(UserSession Session, dynamic Node, params PermissionType[] Permissions)
+	public static bool UserHasFilePermissions(UserSession Session, XmlNode File, params FilePermission[] Permissions)
 	{
-		switch (Node)
+		var FilePermissions = File.GetFilePermissionsData();
+
+		if (FilePermissions.Owner == Session.User.Username)
+			return true;
+		else if (Session.User.Username == "root")
+			return TestPermissions(FilePermissions.RootPermissions, Permissions);
+		else
+			return TestPermissions(FilePermissions.OtherPermissions, Permissions);
+
+		static bool TestPermissions(List<FilePermission> UserPermissions, FilePermission[] TestPermissions)
 		{
-			case XmlNode n:
-				return TestNode(Session, n, Permissions);
-
-			case XmlNodeList nl:
-				foreach (XmlNode n in nl)
-					if (!TestNode(Session, n, Permissions))
-						return false;
-
-				return true;
-
-			default:
-				return false;
-		}
-
-		// I acknowledge that this is a nested function clusterfuck but it is necessary to reduce code size
-		static bool TestNode(UserSession Session, XmlNode n, PermissionType[] Permissions)
-		{
-			var NodePermissions = n.GetPermissionsData();
-
-			if (!NodePermissions.Valid)
-				return false;
-
-			if (NodePermissions.Owner == Session.User.Username)
-				return true;
-			else if (Session.User.Username == "root")
-				return TestPermissionLevelForTypes(NodePermissions.RootPerms, Permissions);
-			else
-				return TestPermissionLevelForTypes(NodePermissions.OtherPerms, Permissions);
-
-			static bool TestPermissionLevelForTypes(PermissionLevel Level, PermissionType[] Permissions)
+			foreach (FilePermission fp in TestPermissions)
 			{
-				foreach (PermissionType p in Permissions)
+				switch (fp)
 				{
-					switch (p)
-					{
-						case PermissionType.Read:
-							if (!HasReadBit(Level))
-								return false;
-							break;
+					case FilePermission.Read:
+						if (!UserPermissions.Contains(FilePermission.Read))
+							return false;
+						break;
 
-						case PermissionType.Write:
-							if (!HasWriteBit(Level))
-								return false;
-							break;
+					case FilePermission.Write:
+						if (!UserPermissions.Contains(FilePermission.Write))
+							return false;
+						break;
 
-						case PermissionType.Execute:
-							if (!HasExecuteBit(Level))
-								return false;
-							break;
-					}
+					case FilePermission.Execute:
+						if (!UserPermissions.Contains(FilePermission.Execute))
+							return false;
+						break;
 				}
-
-				return true;
 			}
+
+			return true;
 		}
 	}
 
-	public static bool HasReadBit(PermissionLevel Level) => Level switch
+	public static bool UserHasDirectoryPermissions(UserSession Session, XmlNode Directory, params DirectoryPermission[] Permissions)
 	{
-		PermissionLevel.Read => true,
-		PermissionLevel.ReadExecute => true,
-		PermissionLevel.ReadWrite => true,
-		PermissionLevel.ReadWriteExecute => true,
-		_ => false
-	};
+		var DirectoryPermissions = Directory.GetDirectoryPermissionsData();
 
-	public static bool HasWriteBit(PermissionLevel Level) => Level switch
-	{
-		PermissionLevel.Write => true,
-		PermissionLevel.WriteExecute => true,
-		PermissionLevel.ReadWrite => true,
-		PermissionLevel.ReadWriteExecute => true,
-		_ => false
-	};
+		if (DirectoryPermissions.Owner == Session.User.Username)
+			return true;
+		else if (Session.User.Username == "root")
+			return TestPermissions(DirectoryPermissions.RootPermissions, Permissions);
+		else
+			return TestPermissions(DirectoryPermissions.OtherPermissions, Permissions);
 
-	public static bool HasExecuteBit(PermissionLevel Level) => Level switch
-	{
-		PermissionLevel.Execute => true,
-		PermissionLevel.WriteExecute => true,
-		PermissionLevel.ReadExecute => true,
-		PermissionLevel.ReadWriteExecute => true,
-		_ => false
-	};
+		static bool TestPermissions(List<DirectoryPermission> UserPermissions, DirectoryPermission[] TestPermissions)
+		{
+			foreach (DirectoryPermission dp in TestPermissions)
+			{
+				switch (dp)
+				{
+					case DirectoryPermission.Enter:
+						if (!UserPermissions.Contains(DirectoryPermission.Enter))
+							return false;
+						break;
+
+					case DirectoryPermission.List:
+						if (!UserPermissions.Contains(DirectoryPermission.List))
+							return false;
+						break;
+
+					case DirectoryPermission.Modify:
+						if (!UserPermissions.Contains(DirectoryPermission.Modify))
+							return false;
+						break;
+				}
+			}
+
+			return true;
+		}
+	}
 
 	public static XmlNode GetNodeFromPath(this Computer Computer, string Query)
 	{
@@ -367,6 +355,11 @@ public static class FSAPI
 					case 'M':
 						Temp.Add(DirectoryPermission.Modify);
 						break;
+
+					case 'n':
+					case 'N':
+						Temp.Clear();
+						return Temp;
 				}
 			}
 
@@ -376,7 +369,7 @@ public static class FSAPI
 
 	public static (string Owner, List<FilePermission> RootPermissions, List<FilePermission> OtherPermissions) GetFilePermissionsData(this XmlNode Node)
 	{
-		// <Directory Perms="root:elm:elm">
+		// <File Perms="root:rwe:rwe">
 
 		string[] PermissionsElements = Node.Attributes["Perms"].Value.Split(':');
 
@@ -414,30 +407,16 @@ public static class FSAPI
 					case 'E':
 						Temp.Add(FilePermission.Execute);
 						break;
+
+					case 'n':
+					case 'N':
+						Temp.Clear();
+						return Temp;
 				}
 			}
 
 			return Temp;
 		}
-	}
-
-	public static (bool Valid, string Owner, PermissionLevel RootPerms, PermissionLevel OtherPerms) GetPermissionsData(this XmlNode Node)
-	{
-		string[] PermissionsElements = Node.Attributes["Perms"].Value.Split(':');
-
-		if (PermissionsElements.Length < 2)
-			return (false, null, PermissionLevel.None, PermissionLevel.None);
-
-		string Owner = PermissionsElements[0];
-		ReadOnlySpan<char> Permissions = PermissionsElements[1].AsSpan();
-
-		if (Permissions.Length != 2)
-			return (false, null, PermissionLevel.None, PermissionLevel.None);
-
-		PermissionLevel RootPermissions = (PermissionLevel)int.Parse(Permissions.Slice(0, 1));
-		PermissionLevel OtherPermissions = (PermissionLevel)int.Parse(Permissions.Slice(1, 1));
-
-		return (true, Owner, RootPermissions, OtherPermissions);
 	}
 
 	#endregion
