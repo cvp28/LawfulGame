@@ -9,8 +9,8 @@ A standard install would simply look like this:
 📁 Lawful
    💻 Lawful.exe
    📁 Content
-       📁 Saves
-          📁 [user's save folder]
-       📁 Story
-          📁 Lawful
+      📁 Saves
+         📁 [user's save folder]
+      📁 Story
+         📁 Lawful
 ```
