@@ -478,7 +478,7 @@ class Program
                 break;
 
             case "SCP":
-                Commands.SecureCopy(Query);
+                //Commands.SecureCopy(Query);
                 break;
 
             case "CAT":
