@@ -1,4 +1,4 @@
-## Official repository of the Lawful text-based adventure hacking game
+## Official repository of Lawful, a text-based adventure hacking game
 
 Repository contains everything needed to run the game in it's current state.  
 The main project is "Lawful", which contains the .sln file needed to open it in Visual Studio.  
